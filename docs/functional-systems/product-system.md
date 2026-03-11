@@ -18,8 +18,20 @@
 | 月卡 | 在有效期内无限次进入 | 按自然月或按购买日起 N 天 |
 | 季卡 / 年卡 | 同月卡，有效期更长 | 同月卡 |
 | 次卡 | 固定次数，有效期内使用 | 按次扣减 |
-| 体验卡 | 首次用户限购，低价体验 | 按次或按天 |
+| **体验卡** | 首次用户限购，1 次进入机会，支持条件退款 | 1 次，含退款窗口 |
 | 时段卡（可选） | 仅限特定时间段进入（如白天场、夜间场） | 按月/次 + 时段限制 |
+
+### 体验卡退款机制
+
+体验卡是唯一支持「进入后反悔退款」的产品类型。规则如下：
+
+- 用户使用体验卡进入健身房（消耗唯一 1 次机会）
+- 用户通过正常出门流程离开健身房
+- 用户**在退款窗口时间内**重新进入隔离间并进行刷脸
+- 系统检测到：身份确认 + 次数已耗尽 + 上次使用为体验卡 + 距进入时间 ≤ 退款窗口
+- 系统自动发起退款，并开 A 门放行用户离开隔离间
+
+> **退款窗口时长**：在产品配置中设定（`trialRefundWindowMinutes`，建议 30 分钟），超出窗口则不可退款。
 
 ---
 
@@ -27,19 +39,20 @@
 
 ```
 Product {
-  id              String       # 产品唯一标识
-  storeId         String?      # 所属门店（null = 通用产品）
-  name            String       # 产品名称
-  type            Enum         # monthly / times / experience / seasonal
-  price           Decimal      # 售价（元）
-  originalPrice   Decimal?     # 划线价（展示用）
-  durationDays    Int?         # 有效期天数（月卡/次卡过期时间）
-  timesTotal      Int?         # 次卡总次数（null = 不限次）
-  allowedHours    String?      # 允许进入时段（如 "06:00-22:00"）
-  isOnSale        Boolean      # 是否上架
-  sortOrder       Int          # 小程序展示排序
-  createdAt       DateTime
-  updatedAt       DateTime
+  id                        String       # 产品唯一标识
+  storeId                   String?      # 所属门店（null = 通用产品）
+  name                      String       # 产品名称
+  type                      Enum         # monthly / times / experience / seasonal
+  price                     Decimal      # 售价（元）
+  originalPrice             Decimal?     # 划线价（展示用）
+  durationDays              Int?         # 有效期天数（月卡/次卡过期时间）
+  timesTotal                Int?         # 次卡总次数（null = 不限次）
+  allowedHours              String?      # 允许进入时段（如 "06:00-22:00"）
+  isOnSale                  Boolean      # 是否上架
+  sortOrder                 Int          # 小程序展示排序
+  trialRefundWindowMinutes  Int?         # 体验卡退款窗口（分钟），null=不支持此退款机制
+  createdAt                 DateTime
+  updatedAt                 DateTime
 }
 ```
 
@@ -47,26 +60,25 @@ Product {
 
 ## 会员资格验证逻辑
 
-当用户刷脸时，工控机通过云端 API 验证该用户是否具有进入权限。
+当用户刷脸时，工控机通过云端 API 验证该用户是否具有进入权限，API 同时返回体验卡退款判断结果。
 
-```
-用户刷脸，请求验证权限（userId + storeId + currentTime）
-        │
-        ▼
-查询该用户在此门店的有效订单列表
-        │
-        ▼
-遍历有效订单：
-  ├── 月卡/年卡：检查 order.expiresAt > now
-  ├── 次卡：检查 order.expiresAt > now AND order.remainingTimes > 0
-  └── 时段卡：以上条件 + 当前时间在 allowedHours 范围内
-        │
-   ┌────┴────┐
-   │ 有有效资格│──► 返回 {eligible: true, productName, expiresAt}
-   └─────────┘      同时扣减次卡次数（次卡场景）
-        │ 无资格
-        ▼
-   返回 {eligible: false, reason: "无有效套餐/已过期/次数用完"}
+```mermaid
+flowchart TD
+    Request["刷脸验证请求\nuserId + storeId + currentTime"]
+    Request --> QueryOrders["查询该用户的有效订单列表"]
+    QueryOrders --> CheckActive{"遍历订单\n是否有有效资格？"}
+
+    CheckActive -->|"月卡/年卡：expiresAt > now"| Eligible["返回\neligible: true\nproductName / expiresAt"]
+    CheckActive -->|"次卡：expiresAt > now\nAND remainingTimes > 0"| Eligible
+    CheckActive -->|"时段卡：以上条件\n+ 在 allowedHours 内"| Eligible
+
+    CheckActive -->|"无有效订单"| NoOrder["返回\neligible: false\nreason: no_valid_order"]
+
+    CheckActive -->|"次卡/体验卡：\nremainingTimes = 0"| CheckTrial{"最近一次使用\n是否为体验卡？"}
+    CheckTrial -->|"否（普通次卡）"| NoTimes["返回\neligible: false\nreason: times_exhausted"]
+    CheckTrial -->|"是（体验卡）"| CheckWindow{"距上次进入时间\n≤ trialRefundWindowMinutes？"}
+    CheckWindow -->|"在窗口内"| TrialRefund["返回\neligible: false\nreason: trial_refund_eligible\nlastCheckinAt / refundAmount"]
+    CheckWindow -->|"超出窗口"| TrialExpired["返回\neligible: false\nreason: trial_refund_expired"]
 ```
 
 ---

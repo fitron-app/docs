@@ -43,11 +43,37 @@ flowchart TD
     StartFace --> CheckCond{"校验：\n隔离间仅1人\nA门已锁 + B门已锁"}
     CheckCond -->|"通过"| FaceMatch["执行人脸比对\n（本地库 → 云端回退）"]
     CheckCond -->|"不满足"| WaitCond["等待条件满足"]
-    FaceMatch -->|"验证通过"| CheckMembership{"检查会员资格"}
-    FaceMatch -->|"验证失败"| FaceFail["拒绝进入\n提示：人脸识别失败，请重试"]
-    CheckMembership -->|"有效资格"| UnlockB["B 门解锁\n提示：请进"]
-    CheckMembership -->|"无资格"| NoMember["B 门不开\n提示：请先购买套餐"]
+    FaceMatch -->|"验证失败"| FaceFail["拒绝\n提示：人脸识别失败，请重试"]
+    FaceMatch -->|"验证通过"| CheckMembership{"检查会员资格\nGET /api/v1/device/membership"}
+
+    CheckMembership -->|"eligible: true"| UnlockB["B 门解锁\n提示：请进"]
+    CheckMembership -->|"reason: no_valid_order"| NoMember["B 门不开\n提示：请先购买套餐"]
+    CheckMembership -->|"reason: times_exhausted"| TimesOut["B 门不开\n提示：次数已用完，请续卡"]
+    CheckMembership -->|"reason: trial_refund_eligible"| TrialRefund["触发体验卡退款流程\n（见下方专项流程）"]
+    CheckMembership -->|"reason: trial_refund_expired"| TrialExpired["B 门不开\n提示：体验已结束，退款窗口已关闭"]
 ```
+
+---
+
+## 体验卡退款触发流程
+
+当刷脸结果为 `trial_refund_eligible` 时，工控机触发以下专项流程：
+
+```mermaid
+flowchart TD
+    Trigger["收到 trial_refund_eligible\n含 lastCheckinAt / refundAmount"]
+    Trigger --> Notify["语音/屏幕提示：\n检测到您使用了体验卡\n将为您退款 ¥XX，请稍候"]
+    Notify --> CallRefund["POST /api/v1/orders/trial-refund\nuserId + storeId"]
+    CallRefund --> RefundResult{"退款 API 结果"}
+    RefundResult -->|"退款成功"| UnlockAOut["A 门解锁\n提示：退款已处理，请出门"]
+    RefundResult -->|"退款失败"| RefundFail["提示：退款处理失败\n请联系客服，A 门同样解锁放行"]
+    UnlockAOut --> MagAOpen["用户推开 A 门离开"]
+    RefundFail --> MagAOpen
+    MagAOpen --> LockAAgain["A 门重新锁定"]
+    LockAAgain --> PushMsg["推送小程序通知\n退款结果 + 金额"]
+```
+
+> **注意**：无论退款 API 是否成功，均应解锁 A 门放行用户，避免将用户困在隔离间。退款失败时记录待处理异常，由后台人工补退。
 
 ### B 门开启后
 
@@ -160,7 +186,10 @@ flowchart TD
 | `EVT_ENTER_REQUEST` | 外部用户按入门按钮 | 检查条件 → 解锁 A 门 |
 | `EVT_DOOR_A_OPEN` | 门磁：A 门打开 | 开始计时等待关闭 |
 | `EVT_DOOR_A_CLOSE` | 门磁：A 门关闭 | 锁定 A 门，触发刷脸 |
-| `EVT_FACE_SUCCESS` | 刷脸验证通过 + 资格有效 | 解锁 B 门 |
+| `EVT_FACE_SUCCESS` | 刷脸验证通过 + 资格有效（`eligible: true`） | 解锁 B 门 |
+| `EVT_FACE_NO_MEMBER` | 刷脸通过 + 无有效资格 | B 门不开，语音提示 |
+| `EVT_FACE_TRIAL_REFUND` | 刷脸通过 + `trial_refund_eligible` | 触发自动退款 → 解锁 A 门 |
+| `EVT_FACE_TRIAL_EXPIRED` | 刷脸通过 + `trial_refund_expired` | B 门不开，提示退款窗口已关闭 |
 | `EVT_DOOR_B_OPEN` | 门磁：B 门打开 | 开始计时等待关闭 |
 | `EVT_DOOR_B_CLOSE` | 门磁：B 门关闭 | 锁定 B 门，上报进入记录 |
 | `EVT_EXIT_REQUEST` | 内部用户触发出门（按钮或自动检测） | 检查条件 → 解锁 B 门 |

@@ -14,7 +14,10 @@ stateDiagram-v2
     PENDING --> CANCELLED : 超时未支付（30分钟）
     PAID --> ACTIVE : 会员权益生效
     ACTIVE --> EXPIRED : 到期 / 次数用完
-    ACTIVE --> REFUNDING : 申请退款
+    ACTIVE --> REFUNDING : 手动申请退款
+    EXPIRED --> TRIAL_REFUND_CHECKING : 体验卡二次刷脸触发
+    TRIAL_REFUND_CHECKING --> REFUNDING : 在退款窗口内
+    TRIAL_REFUND_CHECKING --> EXPIRED : 超出退款窗口
     REFUNDING --> REFUNDED : 退款成功
     EXPIRED --> [*]
     CANCELLED --> [*]
@@ -92,15 +95,52 @@ flowchart TD
 
 ## 退款规则
 
-| 订单类型 | 退款条件 | 退款金额计算 |
-|---|---|---|
-| 月卡（未使用） | 未进入过健身房 | 全额退款 |
-| 月卡（已使用） | 在有效期内 | 按剩余天数比例退款 |
-| 次卡（未使用） | 0 次已用 | 全额退款 |
-| 次卡（已使用）| 有剩余次数 | 按剩余次数比例退款 |
-| 体验卡 | — | 不支持退款（特殊低价产品） |
+| 订单类型 | 退款条件 | 退款金额计算 | 发起方式 |
+|---|---|---|---|
+| 月卡（未使用） | 未进入过健身房 | 全额退款 | 手动申请 |
+| 月卡（已使用） | 在有效期内 | 按剩余天数比例退款 | 手动申请 |
+| 次卡（未使用） | 0 次已用 | 全额退款 | 手动申请 |
+| 次卡（已使用） | 有剩余次数 | 按剩余次数比例退款 | 手动申请 |
+| **体验卡** | **已进入一次 + 距进入时间 ≤ 退款窗口** | **全额退款** | **二次刷脸自动触发** |
 
-> 具体退款规则可在产品配置中设定 `refundPolicy`，上表为默认规则建议。
+> 体验卡退款是系统**自动触发**的，由工控机检测到刷脸结果为 `trial_refund_eligible` 后直接调用退款 API，无需用户手动操作。
+
+---
+
+## 体验卡自动退款 API
+
+工控机调用，无需用户手动申请：
+
+```
+POST /api/v1/orders/trial-refund
+
+Request:
+{
+  "userId": "user_xxx",
+  "storeId": "store_001"
+}
+
+Response（成功）:
+{
+  "success": true,
+  "refundAmount": 9.90,
+  "wxRefundId": "xxx",
+  "message": "退款已发起，预计 1-3 个工作日到账"
+}
+
+Response（失败）:
+{
+  "success": false,
+  "error": "REFUND_WINDOW_EXPIRED",  // 或其他错误码
+  "message": "退款窗口已关闭"
+}
+```
+
+**服务端校验逻辑**：
+1. 查找该用户最近一笔状态为 `EXPIRED`（次数归零）的体验卡订单
+2. 查找对应 `checkin_logs` 中该订单触发的最后一次进入时间 `lastCheckinAt`
+3. 校验 `now - lastCheckinAt ≤ product.trialRefundWindowMinutes`
+4. 通过则调用微信退款 API，更新订单状态为 `REFUNDED`
 
 ---
 
@@ -117,6 +157,7 @@ flowchart TD
 
 - [ ] 订单是否支持多产品合并购买（一次下单多张卡）
 - [ ] 待支付订单超时时间（建议 30 分钟）
-- [ ] 体验卡是否完全不支持退款，还是有条件退款
-- [ ] 退款是否需要审批流程（管理员直接退 vs 需上级审批）
-- [ ] 是否接入微信退款 API 自动退款（vs 线下退款）
+- [x] 体验卡退款机制：二次刷脸自动触发，窗口内全额退款（已确认）
+- [ ] 体验卡退款窗口时长具体值（建议 30 分钟，待运营确认）
+- [ ] 非体验卡退款是否需要审批流程（管理员直接退 vs 需上级审批）
+- [x] 体验卡退款接入微信退款 API 自动退款（已确认）
