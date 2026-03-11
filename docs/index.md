@@ -18,7 +18,7 @@ hero:
 
 features:
   - title: 子系统
-    details: 工控机、云端 API、管理后台 Web、微信小程序——四端协同，清晰分工。
+    details: 工控机、云端 API、管理后台 Web、微信小程序、飞书多维表格——五端协同，清晰分工。
     link: /subsystems/
   - title: 功能系统
     details: 刷脸 AB 门、产品计费、订单核销、淋浴控制、数据分析等 9 大功能模块。
@@ -49,7 +49,7 @@ features:
 | 技术方向 | 负责内容 | 主要子系统 |
 |---|---|---|
 | **硬件端（负责人）** | 硬件设计、选型、组装、工控机程序 | 工控机子系统 |
-| **后端程序员** | 云端服务、API、数据库、消息队列 | 云端 API 服务 |
+| **后端程序员** | 云端服务、API、数据库、消息队列、飞书数据同步 | 云端 API 服务 + 飞书多维表格（同步任务） |
 | **前端程序员** | 管理后台、微信小程序 | 管理后台 Web + 微信小程序 |
 
 > 三端均基于 AI 辅助编程，工期估算已结合 AI 加速因子。
@@ -65,10 +65,12 @@ graph TD
     AdminWeb["管理后台 Web\n门店 / 用户 / 订单 / 数据分析 / 硬件控制"]
     IPC["工控机子系统\n本地人脸库 / 门禁控制 / 灯控 / 淋浴 / UPS 监控"]
     Hardware["控制箱硬件\nAB 门锁 / 门磁 / 摄像头 / 灯光继电器 / 淋浴阀"]
+    Feishu["飞书多维表格\n老板 / 财务 / 灵活数据分析"]
 
     MiniProgram -->|"HTTPS"| CloudAPI
     AdminWeb -->|"HTTPS"| CloudAPI
     CloudAPI -->|"MQTT / HTTP"| IPC
+    CloudAPI -->|"飞书开放平台 API"| Feishu
     IPC -->|"GPIO / RS485 / Relay"| Hardware
 ```
 

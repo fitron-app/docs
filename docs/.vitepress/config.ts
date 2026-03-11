@@ -24,6 +24,7 @@ export default withMermaid(defineConfig({
             { text: '云端 API 服务', link: '/subsystems/cloud-api' },
             { text: '管理后台 Web', link: '/subsystems/admin-web' },
             { text: '微信小程序', link: '/subsystems/mini-program' },
+            { text: '飞书多维表格', link: '/subsystems/feishu-bitable' },
           ],
         },
       ],
