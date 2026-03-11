@@ -5,7 +5,7 @@ export default withMermaid(defineConfig({
   title: '健身房服务系统',
   description: '无人值守连锁健身房服务系统 — 规划文档',
   lang: 'zh-CN',
-  base: '/fitness-system/',
+  base: '/',
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },

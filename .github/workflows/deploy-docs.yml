@@ -1,22 +1,16 @@
-name: 部署文档到 GitHub Pages
+name: 部署文档到 Cloudflare Pages
 
 on:
   push:
     branches:
       - main
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: 拉取代码
         uses: actions/checkout@v4
@@ -35,18 +29,11 @@ jobs:
       - name: 构建文档
         run: npm run docs:build
 
-      - name: 上传构建产物
-        uses: actions/upload-pages-artifact@v3
+      - name: 部署到 Cloudflare Pages
+        uses: cloudflare/pages-action@v1
         with:
-          path: docs/.vitepress/dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 部署到 GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: fitness-system-docs
+          directory: docs/.vitepress/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
