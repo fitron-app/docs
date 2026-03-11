@@ -76,48 +76,31 @@
 
 ## 核心流程：人脸录入
 
-```
-用户进入「人脸录入」页面
-        │
-        ▼
-调起微信摄像头（wx.chooseMedia 或 camera 组件）
-        │
-        ▼
-前端进行基础质量检测（正脸、光线、清晰度）
-        │
-        ▼
-上传照片至云端 POST /api/v1/user/face/enroll
-        │
-   ┌────┴────┐
-   │ 录入成功 │──► 提示成功，返回个人中心
-   └─────────┘
-        │ 失败（质量不达标/重复录入）
-        ▼
-   提示原因，引导重试
+```mermaid
+flowchart TD
+    EnterPage["用户进入「人脸录入」页面"]
+    EnterPage --> OpenCamera["调起微信摄像头\nwx.chooseMedia 或 camera 组件"]
+    OpenCamera --> QualityCheck["前端基础质量检测\n正脸 / 光线 / 清晰度"]
+    QualityCheck -->|"质量不达标"| RetryTip["提示原因，引导重试"]
+    RetryTip --> OpenCamera
+    QualityCheck -->|"质量通过"| Upload["POST /api/v1/user/face/enroll\n上传照片至云端"]
+    Upload -->|"录入成功"| Success["提示成功\n返回个人中心"]
+    Upload -->|"失败"| FailTip["提示原因，引导重试"]
 ```
 
 ---
 
 ## 核心流程：购买产品
 
-```
-浏览产品列表
-        │
-        ▼
-选择套餐 → 选择/输入优惠券
-        │
-        ▼
-POST /api/v1/orders  创建订单
-        │
-        ▼
-wx.requestPayment  唤起微信支付
-        │
-   ┌────┴────┐
-   │ 支付成功 │──► 云端回调确认 → 开通会员 → 展示成功页
-   └─────────┘
-        │ 支付取消/失败
-        ▼
-   返回订单列表，订单状态为「待支付」
+```mermaid
+flowchart TD
+    Browse["浏览产品列表"]
+    Browse --> SelectProduct["选择套餐\n选择/输入优惠券"]
+    SelectProduct --> CreateOrder["POST /api/v1/orders\n创建订单"]
+    CreateOrder --> WxPay["wx.requestPayment\n唤起微信支付"]
+    WxPay -->|"支付成功"| Callback["云端回调确认\n开通会员"]
+    Callback --> ShowSuccess["展示购买成功页"]
+    WxPay -->|"支付取消/失败"| BackToList["返回订单列表\n订单状态=待支付"]
 ```
 
 ---

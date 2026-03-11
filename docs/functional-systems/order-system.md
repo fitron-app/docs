@@ -7,36 +7,18 @@
 
 ## 订单状态流转
 
-```
-                    用户下单
-                      │
-                      ▼
-               ┌─── PENDING ───┐
-               │  （待支付）    │
-               └───────────────┘
-                 │           │
-         支付成功│           │超时未支付（30分钟）
-                 ▼           ▼
-          ┌─── PAID ───┐  CANCELLED
-          │  （已支付） │  （已取消）
-          └────────────┘
-                 │
-         会员权益生效
-                 ▼
-          ┌─── ACTIVE ───┐
-          │  （使用中）   │
-          └──────────────┘
-              │       │
-    到期/次数用完│     │申请退款
-              ▼       ▼
-          EXPIRED   ┌─── REFUNDING ───┐
-          （已过期） │    （退款中）    │
-                    └─────────────────┘
-                              │
-                       退款成功│
-                              ▼
-                          REFUNDED
-                          （已退款）
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING : 用户下单
+    PENDING --> PAID : 支付成功
+    PENDING --> CANCELLED : 超时未支付（30分钟）
+    PAID --> ACTIVE : 会员权益生效
+    ACTIVE --> EXPIRED : 到期 / 次数用完
+    ACTIVE --> REFUNDING : 申请退款
+    REFUNDING --> REFUNDED : 退款成功
+    EXPIRED --> [*]
+    CANCELLED --> [*]
+    REFUNDED --> [*]
 ```
 
 ---
@@ -73,31 +55,15 @@ Order {
 
 ### 小程序端流程
 
-```
-用户选择产品 → 选择优惠券（可选）
-      │
-      ▼
-POST /api/v1/orders
-（服务端：创建订单记录，状态=PENDING，计算应付金额）
-      │
-      ▼
-服务端调用微信支付统一下单 API
-返回 prepay_id 给小程序
-      │
-      ▼
-小程序调用 wx.requestPayment（传入 prepay_id）
-      │
- ┌────┴────┐
- │ 支付成功 │
- └─────────┘
-      │
-      ▼
-微信回调 POST /api/v1/payments/wx-notify
-（服务端：验签 → 更新订单状态=PAID → 计算并写入 expiresAt/remainingTimes → 状态=ACTIVE）
-      │
-      ▼
-小程序轮询订单状态（或 WebSocket 推送）
-显示购买成功页面
+```mermaid
+flowchart TD
+    SelectProduct["用户选择产品\n选择优惠券（可选）"]
+    SelectProduct --> CreateOrder["POST /api/v1/orders\n创建订单，状态=PENDING，计算应付金额"]
+    CreateOrder --> WxUnified["服务端调用微信支付统一下单 API\n返回 prepay_id 给小程序"]
+    WxUnified --> WxPay["小程序调用 wx.requestPayment"]
+    WxPay -->|"支付成功"| WxNotify["微信回调 POST /api/v1/payments/wx-notify\n验签 → 订单=PAID → 计算 expiresAt → 状态=ACTIVE"]
+    WxPay -->|"支付取消/失败"| PayFail["返回订单列表\n订单状态=待支付"]
+    WxNotify --> PollStatus["小程序轮询订单状态\n展示购买成功页面"]
 ```
 
 ### 支付回调安全处理
@@ -112,22 +78,14 @@ POST /api/v1/orders
 
 次卡每次用户成功进入时由云端 API 执行：
 
-```
-工控机上报进入事件（userId + storeId + orderId）
-        │
-        ▼
-服务端：查找对应 ACTIVE 次卡订单
-        │
-        ▼
-原子操作：remainingTimes - 1
-        │
-   ┌────┴────┐
-   │ 还有次数 │──► 保持 ACTIVE 状态
-   └─────────┘
-        │ 次数归零
-        ▼
-   更新状态 = EXPIRED
-   写入 order_use_logs 记录
+```mermaid
+flowchart TD
+    Report["工控机上报进入事件\nuserId + storeId + orderId"]
+    Report --> FindOrder["服务端查找对应 ACTIVE 次卡订单"]
+    FindOrder --> Deduct["原子操作：remainingTimes - 1"]
+    Deduct -->|"仍有剩余次数"| KeepActive["保持 ACTIVE 状态"]
+    Deduct -->|"次数归零"| SetExpired["更新状态 = EXPIRED"]
+    SetExpired --> WriteLog["写入 order_use_logs 记录"]
 ```
 
 ---

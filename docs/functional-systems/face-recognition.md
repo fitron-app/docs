@@ -9,16 +9,15 @@
 
 入口采用 **AB 门隔离间**结构：两道门（A 门朝外、B 门朝内）围成一个独立隔离区域。任意时刻只允许一道门处于开放状态，确保进出人员唯一可控，同时完成身份验证后方可通过 B 门进入健身区。
 
-```
-外部街道
-    │
-  [A 门]  ← 外门（朝外）
-    │
-  隔离间  ← 封闭空间，内有摄像头 + 人体传感器
-    │
-  [B 门]  ← 内门（朝健身区）
-    │
-健身区内部
+```mermaid
+graph TD
+    Street["外部街道"]
+    DoorA["A 门\n外门（朝外）"]
+    Chamber["隔离间\n摄像头 + 人体传感器"]
+    DoorB["B 门\n内门（朝健身区）"]
+    Gym["健身区内部"]
+
+    Street --> DoorA --> Chamber --> DoorB --> Gym
 ```
 
 ---
@@ -36,54 +35,28 @@
 
 ### 进入隔离间后（等待刷脸）
 
-```
-用户进入隔离间
-      │
-      ▼
-检测到 A 门关闭（门磁信号）
-      │
-      ▼
-A 门重新锁定
-      │
-      ▼
-摄像头启动人脸识别
-      │
-      ▼
-校验：隔离间内仅有 1 人 ＋ A 门已锁 ＋ B 门已锁
-      │
-      ▼
-执行人脸比对（本地库 → 云端验证回退）
-      │
- ┌────┴────┐
- │ 验证通过 │──► 检查该用户是否有有效会员/次卡
- └─────────┘         │
-      │          ┌────┴────┐
-      │          │ 有效资格 │──► B 门解锁，提示"请进"
-      │          └─────────┘
-      │               │ 无有效资格
-      │               ▼
-      │          B 门不开，提示"请先购买套餐"
-      │
-      ▼ 验证失败
- B 门不开，提示"人脸识别失败，请重试"
+```mermaid
+flowchart TD
+    Enter["用户进入隔离间"] --> MagA["检测到 A 门关闭\n（门磁信号）"]
+    MagA --> LockA["A 门重新锁定"]
+    LockA --> StartFace["摄像头启动人脸识别"]
+    StartFace --> CheckCond{"校验：\n隔离间仅1人\nA门已锁 + B门已锁"}
+    CheckCond -->|"通过"| FaceMatch["执行人脸比对\n（本地库 → 云端回退）"]
+    CheckCond -->|"不满足"| WaitCond["等待条件满足"]
+    FaceMatch -->|"验证通过"| CheckMembership{"检查会员资格"}
+    FaceMatch -->|"验证失败"| FaceFail["拒绝进入\n提示：人脸识别失败，请重试"]
+    CheckMembership -->|"有效资格"| UnlockB["B 门解锁\n提示：请进"]
+    CheckMembership -->|"无资格"| NoMember["B 门不开\n提示：请先购买套餐"]
 ```
 
 ### B 门开启后
 
-```
-B 门解锁
-      │
-      ▼
-用户推开 B 门进入健身区
-      │
-      ▼
-检测到 B 门关闭（门磁信号）
-      │
-      ▼
-B 门重新锁定
-      │
-      ▼
-进入记录写入云端（用户ID、门店ID、时间戳、进入方式=刷脸）
+```mermaid
+flowchart TD
+    UnlockB["B 门解锁"] --> OpenB["用户推开 B 门进入健身区"]
+    OpenB --> MagB["检测到 B 门关闭（门磁信号）"]
+    MagB --> LockB["B 门重新锁定"]
+    LockB --> WriteLog["进入记录写入云端\n用户ID / 门店ID / 时间戳 / 进入方式=刷脸"]
 ```
 
 ---
@@ -104,29 +77,16 @@ B 门重新锁定
 
 ### 进入隔离间后（出门）
 
-```
-用户进入隔离间（来自健身区）
-      │
-      ▼
-检测到 B 门关闭（门磁信号）
-      │
-      ▼
-B 门重新锁定
-      │
-      ▼
-A 门解锁（无需验证，直接出）
-      │
-      ▼
-用户推开 A 门离开
-      │
-      ▼
-检测到 A 门关闭（门磁信号）
-      │
-      ▼
-A 门重新锁定
-      │
-      ▼
-离开记录写入云端（用户ID 待确认 — 见"离开记录说明"）
+```mermaid
+flowchart TD
+    EnterChamber["用户进入隔离间\n（来自健身区）"]
+    EnterChamber --> MagBClose["检测到 B 门关闭\n（门磁信号）"]
+    MagBClose --> LockBAgain["B 门重新锁定"]
+    LockBAgain --> UnlockA["A 门解锁\n无需验证，直接出"]
+    UnlockA --> OpenA["用户推开 A 门离开"]
+    OpenA --> MagAClose["检测到 A 门关闭\n（门磁信号）"]
+    MagAClose --> LockAAgain["A 门重新锁定"]
+    LockAAgain --> WriteExitLog["离开记录写入云端\n（用户 ID 待确认，见说明）"]
 ```
 
 ### 离开记录说明
@@ -159,40 +119,23 @@ A 门重新锁定
 
 ### 首次录入（小程序端）
 
-```
-小程序摄像头采集人脸照片
-        │
-        ▼
-POST /api/v1/user/face/enroll
-（上传照片，云端提取特征向量存库）
-        │
-        ▼
-云端推送 MQTT: store/*/face/sync
-（通知所有门店工控机同步新用户特征向量）
+```mermaid
+flowchart TD
+    Capture["小程序摄像头采集人脸照片"]
+    Capture --> Upload["POST /api/v1/user/face/enroll\n上传照片，云端提取特征向量存库"]
+    Upload --> MqttPush["云端推送 MQTT: store/*/face/sync\n通知所有门店工控机同步新用户特征向量"]
 ```
 
 ### 刷脸验证（工控机端）
 
-```
-摄像头实时采集人脸
-        │
-        ▼
-本地特征向量比对（SQLite + 人脸 SDK）
-        │
-   ┌────┴────┐
-   │ 本地命中 │──► 直接使用本地验证结果
-   └─────────┘
-        │ 未命中
-        ▼
-POST /api/v1/device/face/verify
-（上传图像，云端比对全库）
-        │
-   ┌────┴────┐
-   │ 云端命中 │──► 返回特征向量 → 写入本地库 → 验证通过
-   └─────────┘
-        │ 未命中
-        ▼
-   验证失败
+```mermaid
+flowchart TD
+    Camera["摄像头实时采集人脸"] --> LocalMatch["本地特征向量比对\nSQLite + 人脸 SDK"]
+    LocalMatch -->|"本地命中"| LocalOK["直接使用本地验证结果"]
+    LocalMatch -->|"未命中"| CloudVerify["POST /api/v1/device/face/verify\n上传图像，云端比对全库"]
+    CloudVerify -->|"云端命中"| SaveLocal["返回特征向量\n写入本地库"]
+    SaveLocal --> CloudOK["验证通过"]
+    CloudVerify -->|"未命中"| Fail["验证失败"]
 ```
 
 ---

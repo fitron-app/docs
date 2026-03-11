@@ -30,36 +30,19 @@
 
 ## 淋浴控制流程（软件层）
 
-```
-用户在小程序点击「启动淋浴」
-        │
-        ▼
-POST /api/v1/shower/start（userId + storeId + showerStallId）
-服务端：
-  1. 校验用户淋浴权益（是否有使用资格）
-  2. 校验淋浴间是否空闲（防止重复启动）
-  3. 扣减淋浴次数（如按次计算）
-        │
-   ┌────┴────┐
-   │ 校验通过 │──► 通过 MQTT 向工控机发送开阀指令
-   └─────────┘      同时记录开始时间
-        │ 校验失败
-        ▼
-   返回失败原因（无权益/已在使用中）
-        │
-        ▼
-工控机收到指令 → 开启热水阀
-        │
-        ▼
-云端启动倒计时（默认 N 分钟）
-        │
-   用户可通过小程序提前停止
-        │
-        ▼
-倒计时结束 → 发送关阀指令 → 工控机关闭热水阀
-        │
-        ▼
-POST /api/v1/shower/complete（记录使用时长）
+```mermaid
+flowchart TD
+    TapStart["用户在小程序点击「启动淋浴」"]
+    TapStart --> PostStart["POST /api/v1/shower/start\nuserId + storeId + showerStallId"]
+    PostStart --> CheckRight{"校验淋浴权益\n及淋浴间空闲"}
+    CheckRight -->|"校验失败"| Fail["返回失败原因\n无权益 / 已在使用中"]
+    CheckRight -->|"校验通过"| MqttOpen["MQTT 向工控机发送开阀指令\n记录开始时间"]
+    MqttOpen --> IPCOpen["工控机开启热水阀"]
+    IPCOpen --> Countdown["云端启动倒计时（N 分钟）\n小程序展示倒计时"]
+    Countdown -->|"倒计时结束"| MqttClose["发送关阀指令"]
+    Countdown -->|"用户提前停止"| MqttClose
+    MqttClose --> IPCClose["工控机关闭热水阀"]
+    IPCClose --> Complete["POST /api/v1/shower/complete\n记录使用时长"]
 ```
 
 ---

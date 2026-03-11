@@ -65,27 +65,15 @@ UserCoupon {
 
 ## 核销流程
 
-```
-用户在小程序选择产品 → 勾选可用优惠券
-        │
-        ▼
-POST /api/v1/orders（传入 couponId）
-服务端：校验优惠券
-  ├── 检查 status = UNUSED
-  ├── 检查 expiresAt > now
-  ├── 检查产品是否在 applicableProducts 范围内
-  └── 检查满足 thresholdAmount 条件
-        │
-   ┌────┴────┐
-   │ 校验通过 │──► 计算折扣后金额 → 创建订单
-   └─────────┘
-        │
-        ▼
-用户支付成功后（微信回调确认）
-        │
-        ▼
-更新 UserCoupon.status = USED
-写入 usedAt / usedOrderId
+```mermaid
+flowchart TD
+    SelectProduct["用户选择产品\n勾选可用优惠券"]
+    SelectProduct --> CreateOrder["POST /api/v1/orders 传入 couponId"]
+    CreateOrder --> Validate{"服务端校验优惠券\nstatus=UNUSED\nexpiresAt>now\n产品范围匹配\n满足门槛金额"}
+    Validate -->|"校验通过"| CalcDiscount["计算折扣后金额 → 创建订单"]
+    Validate -->|"校验失败"| RejectCoupon["返回错误，提示原因"]
+    CalcDiscount --> Payment["用户完成支付\n微信回调确认"]
+    Payment --> MarkUsed["更新 UserCoupon.status = USED\n写入 usedAt / usedOrderId"]
 ```
 
 ---

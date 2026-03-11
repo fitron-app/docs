@@ -43,15 +43,23 @@
 
 ## 本地服务架构
 
-```
-工控机进程
-├── HardwareController       # 硬件 I/O 管理（GPIO、继电器）
-├── FaceEngine               # 本地人脸 SDK 封装（比对、特征提取）
-├── LocalFaceDatabase        # 本地人脸特征数据库（SQLite / 文件）
-├── DoorStateMachine         # AB 门状态机（核心控制逻辑）
-├── MqttClient               # 与云端 MQTT Broker 通信
-├── HttpClient               # 主动上报事件到云端 API
-└── LocalHttpServer          # 可选：提供局域网内 HTTP 接口（供管理后台直连调试）
+```mermaid
+graph TD
+    subgraph IPC_Process ["工控机进程"]
+        HW["HardwareController\nGPIO / 继电器 I/O 管理"]
+        Face["FaceEngine\n本地人脸 SDK 封装"]
+        FaceDB["LocalFaceDatabase\nSQLite 人脸特征库"]
+        Door["DoorStateMachine\nAB 门状态机（核心）"]
+        MQTT["MqttClient\n与云端 MQTT Broker 通信"]
+        HTTP["HttpClient\n事件主动上报至云端"]
+        LocalHTTP["LocalHttpServer\n局域网调试接口（可选）"]
+    end
+
+    Door --> HW
+    Door --> Face
+    Face --> FaceDB
+    Door --> MQTT
+    Door --> HTTP
 ```
 
 ---

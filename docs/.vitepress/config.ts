@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: '健身房服务系统',
   description: '无人值守连锁健身房服务系统 — 规划文档',
   lang: 'zh-CN',
@@ -95,4 +96,7 @@ export default defineConfig({
       },
     },
   },
-})
+  mermaid: {
+    theme: 'default',
+  },
+}))

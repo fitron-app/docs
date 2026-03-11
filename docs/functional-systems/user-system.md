@@ -7,26 +7,14 @@
 
 ## 用户注册流程
 
-```
-用户打开小程序
-      │
-      ▼
-wx.login 获取 code
-      │
-      ▼
-POST /api/v1/auth/wx-login（传入 code）
-服务端：code 换取 openId + session_key
-      │
- ┌────┴──────┐
- │ 用户已存在 │──► 更新登录时间 → 签发 JWT → 返回
- └───────────┘
-      │ 新用户
-      ▼
-创建用户记录（openId、微信昵称、头像 URL）
-签发 JWT
-      │
-      ▼
-引导用户完成人脸录入（新用户标记 faceEnrolled=false）
+```mermaid
+flowchart TD
+    Open["用户打开小程序"] --> WxLogin["wx.login 获取 code"]
+    WxLogin --> PostLogin["POST /api/v1/auth/wx-login\ncode 换取 openId + session_key"]
+    PostLogin -->|"用户已存在"| UpdateLogin["更新登录时间 → 签发 JWT → 返回"]
+    PostLogin -->|"新用户"| CreateUser["创建用户记录\nopenId / 微信昵称 / 头像 URL"]
+    CreateUser --> IssueJWT["签发 JWT"]
+    IssueJWT --> GuideFace["引导完成人脸录入\nfaceEnrolled = false"]
 ```
 
 ---

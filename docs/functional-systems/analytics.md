@@ -79,14 +79,13 @@
 
 ### 同步方式
 
-```
-云端 API（定时任务 / 触发器）
-        │
-        ▼
-飞书开放平台 API（多维表格写入接口）
-        │
-        ▼
-飞书多维表格
+```mermaid
+flowchart LR
+    CloudTask["云端 API\n定时任务 / 触发器"]
+    FeishuAPI["飞书开放平台 API\n多维表格写入接口"]
+    FeishuTable["飞书多维表格"]
+
+    CloudTask -->|"App Token 鉴权"| FeishuAPI --> FeishuTable
 ```
 
 > 使用飞书开放平台的「多维表格」API，通过 App Token 鉴权写入数据。
