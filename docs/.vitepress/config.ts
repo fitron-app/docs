@@ -39,6 +39,7 @@ export default withMermaid(defineConfig({
             { text: '订单系统', link: '/functional-systems/order-system' },
             { text: '用户系统', link: '/functional-systems/user-system' },
             { text: '优惠券系统', link: '/functional-systems/coupon-system' },
+            { text: '外部平台券码核销', link: '/functional-systems/external-voucher' },
             { text: '淋浴系统', link: '/functional-systems/shower-system' },
             { text: '硬件控制系统', link: '/functional-systems/hardware-control' },
             { text: '数据分析系统', link: '/functional-systems/analytics' },

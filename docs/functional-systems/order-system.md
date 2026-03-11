@@ -9,7 +9,8 @@
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING : 用户下单
+    [*] --> PENDING : 微信支付下单
+    [*] --> ACTIVE : 外部券码核销（直接激活）
     PENDING --> PAID : 支付成功
     PENDING --> CANCELLED : 超时未支付（30分钟）
     PAID --> ACTIVE : 会员权益生效
@@ -35,15 +36,17 @@ Order {
   storeId         String?      # 购买时所在门店（null = 线上购买）
   productId       String       # 产品 ID
   productSnapshot Json         # 购买时产品快照（防止产品修改后影响订单）
-  couponId        String?      # 使用的优惠券 ID
-  originalAmount  Decimal      # 原价
+  couponId        String?      # 使用的内部优惠券 ID
+  source          Enum         # WECHAT_PAY（微信支付）/ EXTERNAL_VOUCHER（外部平台券码）
+  voucherCodeId   String?      # 关联券码 ID（source=EXTERNAL_VOUCHER 时填写）
+  originalAmount  Decimal      # 原价（外部券码订单为券面对应价值，实付=0）
   discountAmount  Decimal      # 优惠金额
-  payAmount       Decimal      # 实付金额
+  payAmount       Decimal      # 实付金额（外部券码订单为 0）
   status          Enum         # PENDING/PAID/ACTIVE/EXPIRED/CANCELLED/REFUNDING/REFUNDED
-  paymentMethod   String?      # 支付方式（wechat）
+  paymentMethod   String?      # 支付方式（wechat / external_voucher）
   wxTransactionId String?      # 微信支付流水号
-  paidAt          DateTime?    # 支付时间
-  expiresAt       DateTime?    # 有效期截止时间（付款后计算）
+  paidAt          DateTime?    # 支付/核销时间
+  expiresAt       DateTime?    # 有效期截止时间
   remainingTimes  Int?         # 次卡剩余次数
   refundedAt      DateTime?    # 退款时间
   refundReason    String?      # 退款原因
