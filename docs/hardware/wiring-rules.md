@@ -29,7 +29,7 @@
 | `LOCK_B` | B 门电磁锁 |
 | `MAG_A` | A 门门磁传感器 |
 | `MAG_B` | B 门门磁传感器 |
-| `PIR` | 隔离间人体传感器 |
+| `CAM_COUNT` | 隔离间人数检测摄像头（AI 客流统计，取代旧方案 PIR） |
 | `BTN_IN` | 入口开门按钮 |
 | `BTN_OUT` | 隔离间出门按钮 |
 | `CAM` | 人脸识别摄像头 |
@@ -69,7 +69,6 @@
         ├──► LOCK_B 正极
         ├──► MAG_A 供电 +
         ├──► MAG_B 供电 +
-        ├──► PIR 供电 +（VCC）
         ├──► BTN_IN 供电 +（如有源按钮）
         └──► RLY_DOOR 线圈供电 +
 
@@ -101,7 +100,7 @@
 |---|---|---|---|
 | `MAG_A_STATE` | GPIO_XX | `MAG_A` 信号输出 | 低电平 = 门关闭（常闭型门磁） |
 | `MAG_B_STATE` | GPIO_XX | `MAG_B` 信号输出 | 同上 |
-| `PIR_STATE` | GPIO_XX | `PIR` 信号输出 | 高电平 = 有人检测到 |
+| `COUNT_STATE` | 网络/RTSP | `CAM_COUNT` 摄像头 | 通过 RTSP 拉流 + AI 分析，工控机获取隔离间人数（0/1/多人） |
 | `BTN_IN_TRIG` | GPIO_XX | `BTN_IN` 信号输出 | 低电平触发（按下 = 拉低） |
 | `BTN_OUT_TRIG` | GPIO_XX | `BTN_OUT` 信号输出 | 同上 |
 

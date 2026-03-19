@@ -114,24 +114,50 @@ flowchart TD
 
 ---
 
-## 技术选型建议
+## 技术选型建议（Java 云端 API）
 
 | 组件 | 建议方案 | 备注 |
 |---|---|---|
-| 开发语言 | Python (FastAPI) 或 Node.js (NestJS) | AI 生成代码质量较高 |
-| 数据库 | PostgreSQL | 生产级稳定性 |
+| 开发语言 | Java 21（LTS） | 统一后端主栈，减少跨语言维护成本 |
+| 后端框架 | Spring Boot 3.x | 单体优先，后续按业务边界拆分服务 |
+| 持久层 | MyBatis-Plus（CRUD）+ MyBatis（复杂 SQL） | 兼顾开发效率与复杂查询可控性 |
+| 数据库迁移 | Flyway | 保证环境间 Schema 变更可追踪、可回滚 |
+| 数据库 | PostgreSQL | 生产级稳定性，适合事务型业务 |
 | 缓存 | Redis | 会话、限流、人脸验证结果缓存 |
+| 消息队列（可选） | RabbitMQ | 处理支付回调、飞书同步等异步任务 |
 | MQTT Broker | EMQX（Docker 部署） | 支持大量设备连接 |
-| 对象存储 | 阿里云 OSS / 腾讯 COS | 存储人脸图片原图（可选） |
-| 部署方式 | Docker Compose / K8s | 按规模选择 |
-| 支付集成 | 微信支付 API | 小程序内购买 |
+| 对象存储 | 腾讯云 COS | 存储人脸图片原图（可选） |
+| API 文档 | springdoc-openapi（Swagger UI） | 自动生成接口文档，便于前后端协作 |
+| 部署方式 | Docker Compose（当前）/ K8s（后续） | 小团队先用 Compose，规模扩大再迁移 |
+| 支付集成 | 微信支付 API v3 | 小程序内购买，要求签名验签与幂等处理 |
+
+### Java 工程结构建议
+
+```text
+cloud-api/
+├── src/main/java/com/eachcan/fitness
+│   ├── auth            # 登录鉴权、JWT、权限
+│   ├── user            # 用户、会员状态
+│   ├── face            # 人脸特征与远程验证
+│   ├── store           # 门店与设备绑定
+│   ├── product         # 产品/套餐
+│   ├── order           # 订单、支付、退款
+│   ├── coupon          # 优惠券发放与核销
+│   ├── hardware        # 远程开门、灯控指令
+│   ├── analytics       # 报表聚合、飞书同步
+│   ├── common          # 通用异常、响应体、工具类
+│   └── infrastructure  # DB/Redis/MQTT/消息队列适配
+└── src/main/resources
+    ├── application.yml
+    ├── mapper/
+    └── db/migration    # Flyway SQL
+```
 
 ---
 
 ## 待确认事项
 
-- [ ] 技术栈最终选型（Python FastAPI vs Node.js NestJS）
 - [ ] 人脸特征向量存储方式（数据库字段 vs 向量数据库）
 - [ ] 多门店数据隔离策略（单库多租户 vs 多库）
 - [ ] 飞书多维表格数据推送的触发时机与频率
-- [ ] 微信支付接入方式（直接 API vs 第三方聚合支付）
+- [ ] 微信支付接入深度（仅 JSAPI + 退款，或增加分账能力）

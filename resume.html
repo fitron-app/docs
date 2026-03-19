@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>张金帅 - 技术总监/CTO简历</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .resume-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .name {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .title {
+            font-size: 24px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 15px;
+            opacity: 0.9;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .main-content {
+            padding: 50px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            color: #1e3c72;
+            border-bottom: 3px solid #1e3c72;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 28px;
+            background: #1e3c72;
+            border-radius: 4px;
+        }
+        
+        .profile-text {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+        
+        .experience-item {
+            position: relative;
+            margin-bottom: 35px;
+            padding-left: 30px;
+        }
+        
+        .experience-item::before {
+            content: '';
+            position: absolute;
+            left: -36px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+        
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .company-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+        
+        .position {
+            font-size: 16px;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .date {
+            font-size: 14px;
+            color: #888;
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        
+        .exp-content {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        
+        .achievements {
+            margin-top: 12px;
+            padding-left: 20px;
+        }
+        
+        .achievements li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .achievements li::marker {
+            color: #667eea;
+        }
+        
+        .tech-stack {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tech-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .education-item {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .edu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .school {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+        
+        .major {
+            font-size: 16px;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .skill-category {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-top: 3px solid #667eea;
+        }
+        
+        .skill-title {
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .skill-list {
+            list-style: none;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .skill-list li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .skill-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 1px solid #667eea30;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .highlight-title {
+            font-size: 18px;
+            color: #1e3c72;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .highlight-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .highlight-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .highlight-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .resume-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header, .main-content {
+                padding: 30px 20px;
+            }
+            .name {
+                font-size: 36px;
+            }
+            .exp-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="resume-container">
+        <!-- 头部信息 -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="name">张金帅</h1>
+                <div class="title">技术总监 / CTO / 高级技术管理者</div>
+                <div class="contact-info">
+                    <div class="contact-item">📅 1986年3月 | 男</div>
+                    <div class="contact-item">🎓 辽宁科技大学·网络工程·本科</div>
+                    <div class="contact-item">💼 15年技术管理经验</div>
+                    <div class="contact-item">🎯 全栈技术架构专家</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 个人简介 -->
+            <section class="section">
+                <h2 class="section-title">个人简介</h2>
+                <div class="profile-text">
+                    拥有15年技术研发与管理经验的技术领导者，具备从0到1搭建技术体系、组建技术团队、推动产品落地的完整能力。历经互联网、金融科技、智能硬件、工业视觉等多个领域，擅长复杂系统架构设计、跨平台技术整合及AI工程化落地。具备创业经历与大型企业技术管理双重背景，对技术战略规划和团队建设有深刻洞察。
+                </div>
+            </section>
+
+            <!-- 职业亮点 -->
+            <div class="highlight-box">
+                <div class="highlight-title">🏆 核心成就概览</div>
+                <div class="highlight-grid">
+                    <div class="highlight-item">
+                        <div class="highlight-number">5+</div>
+                        <div class="highlight-label">技术领域跨越</div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-number">3</div>
+                        <div class="highlight-label">创业公司创立经历</div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-number">10+</div>
+                        <div class="highlight-label">商业化产品主导</div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-number">全栈</div>
+                        <div class="highlight-label">技术架构能力</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 工作经历 -->
+            <section class="section">
+                <h2 class="section-title">工作经历</h2>
+                <div class="timeline">
+                    
+                    <!-- 壹码科技 -->
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="company-name">北京壹码科技有限公司</div>
+                                <div class="position">技术总负责人</div>
+                            </div>
+                            <span class="date">2022年5月 - 至今</span>
+                        </div>
+                        <div class="exp-content">
+                            <ul class="achievements">
+                                <li>主导SCADA数据采集平台架构设计与开发，实现工业设备数据实时采集与监控</li>
+                                <li>研发X射线液位检测系统，建立高精度视觉检测解决方案</li>
+                                <li>构建壹码检测新架构，建立模块化设计体系，适配不同检测设备需求</li>
+                                <li>建立无监督检测光学环境标准，提升检测精度与稳定性</li>
+                                <li>搭建壹码ERP及研发内部平台，完善工单与工厂服务体系</li>
+                                <li>制定光学测试规范，建立适应不同检测对象的评估体系</li>
+                            </ul>
+                            <div class="tech-stack">
+                                <span class="tech-tag">C++</span>
+                                <span class="tech-tag">React</span>
+                                <span class="tech-tag">Halcon</span>
+                                <span class="tech-tag">OpenCV</span>
+                                <span class="tech-tag">工业视觉</span>
+                                <span class="tech-tag">工控机软件</span>
+                                <span class="tech-tag">组态软件</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 小雅星空 -->
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="company-name">北京小雅星空科技有限公司（喜马拉雅全资子公司）</div>
+                                <div class="position">CTO / 技术负责人</div>
+                            </div>
+                            <span class="date">2019年3月 - 2022年</span>
+                        </div>
+                        <div class="exp-content">
+                            <div style="margin-bottom: 10px; color: #667eea; font-weight: 600;">2019.03 - 2021.09：小雅开放平台技术负责人 | 2021.09起：CTO</div>
+                            <ul class="achievements">
+                                <li>创立并主导小雅OS研发，构建完整的语音操作系统生态</li>
+                                <li>负责智能音箱系列产品技术架构，从硬件到云端全链路把控</li>
+                                <li>主导蓝牙耳机系列及早教机系列产品技术落地</li>
+                                <li>建立喜马拉雅内容输出新渠道，拓展音频内容分发能力</li>
+                                <li>搭建AI工程化平台与大数据平台，支撑智能化业务需求</li>
+                                <li>管理跨职能技术团队，涵盖前端、Android、嵌入式、后端、算法等</li>
+                            </ul>
+                            <div class="tech-stack">
+                                <span class="tech-tag">Java</span>
+                                <span class="tech-tag">React</span>
+                                <span class="tech-tag">C++</span>
+                                <span class="tech-tag">Android</span>
+                                <span class="tech-tag">嵌入式</span>
+                                <span class="tech-tag">AI工程化</span>
+                                <span class="tech-tag">大数据</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 联合钛信/南京金融资产交易中心 -->
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="company-name">北京联合钛信科技有限公司 / 南京金融资产交易中心</div>
+                                <div class="position">技术负责人 / 研发总监</div>
+                            </div>
+                            <span class="date">2017年3月 - 2019年</span>
+                        </div>
+                        <div class="exp-content">
+                            <div style="margin-bottom: 10px; color: #667eea; font-weight: 600;">2017.03 - 2018.04：南京金融资产交易中心研发总监 | 2018.04起：联合钛信技术负责人</div>
+                            <ul class="achievements">
+                                <li>设计并实施金融资产分发平台，实现金融资产高效流转</li>
+                                <li>搭建小额贷款平台，完成金融业务数字化能力建设</li>
+                                <li>创立并建设和签（国家电子合同平台），提供合规电子签约服务</li>
+                                <li>建立金融科技领域完整的技术风控与合规体系</li>
+                            </ul>
+                            <div class="tech-stack">
+                                <span class="tech-tag">金融科技</span>
+                                <span class="tech-tag">电子合同</span>
+                                <span class="tech-tag">风控系统</span>
+                                <span class="tech-tag">分布式架构</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 创业经历 -->
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="company-name">北京观正科技有限公司 / 北京乐舞科技有限公司等</div>
+                                <div class="position">创始人 / 联合创始人</div>
+                            </div>
+                            <span class="date">2012年6月 - 2017年3月</span>
+                        </div>
+                        <div class="exp-content">
+                            <ul class="achievements">
+                                <li>创立多家科技公司，担任主创始人或联合创始人角色</li>
+                                <li>主导网页游戏项目研发与运营，积累互联网产品经验</li>
+                                <li>研发视频DRM技术，构建内容保护解决方案</li>
+                                <li>开发中老年社交平台，探索垂直社交领域</li>
+                                <li>完成多轮融资谈判与团队组建，具备完整创业闭环经验</li>
+                            </ul>
+                            <div class="tech-stack">
+                                <span class="tech-tag">PHP</span>
+                                <span class="tech-tag">Node.js</span>
+                                <span class="tech-tag">JavaScript</span>
+                                <span class="tech-tag">HTML5</span>
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">Flash</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 可牛/金山/猎豹 -->
+                    <div class="experience-item">
+                        <div class="exp-header">
+                            <div>
+                                <div class="company-name">可牛网络 → 金山网络 → 猎豹移动</div>
+                                <div class="position">研发工程师 → 研发组长</div>
+                            </div>
+                            <span class="date">2010年 - 2012年6月</span>
+                        </div>
+                        <div class="exp-content">
+                            <ul class="achievements">
+                                <li>负责可牛影像后端系统开发，支撑千万级用户图片处理服务</li>
+                                <li>主导金山电池医生后端架构，优化移动端性能管理服务</li>
+                                <li>设计并实现金山毒霸会员与账号体系，构建商业化基础能力</li>
+                                <li>从研发工程师晋升为研发组长，开始技术团队管理实践</li>
+                            </ul>
+                            <div class="tech-stack">
+                                <span class="tech-tag">PHP</span>
+                                <span class="tech-tag">MySQL</span>
+                                <span class="tech-tag">Linux</span>
+                                <span class="tech-tag">高并发架构</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- 教育背景 -->
+            <section class="section">
+                <h2 class="section-title">教育背景</h2>
+                <div class="education-item">
+                    <div class="edu-header">
+                        <div class="school">辽宁科技大学</div>
+                        <span class="date">2006年 - 2010年</span>
+                    </div>
+                    <div class="major">计算机学院 · 网络工程专业 · 本科</div>
+                    <div style="margin-top: 10px; color: #666; font-size: 14px;">
+                        主修课程：计算机网络、操作系统、数据结构、软件工程、数据库原理、网络安全等
+                    </div>
+                </div>
+            </section>
+
+            <!-- 专业技能 -->
+            <section class="section">
+                <h2 class="section-title">专业技能</h2>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <div class="skill-title">后端与架构</div>
+                        <ul class="skill-list">
+                            <li>Java / PHP / Node.js / Python / C++</li>
+                            <li>微服务架构与分布式系统设计</li>
+                            <li>高并发系统设计与性能优化</li>
+                            <li>数据库设计与中间件应用</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-title">前端与客户端</div>
+                        <ul class="skill-list">
+                            <li>React / HTML5 / JavaScript</li>
+                            <li>Android应用开发</li>
+                            <li>嵌入式系统与固件开发</li>
+                            <li>跨平台解决方案</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-title">AI与数据</div>
+                        <ul class="skill-list">
+                            <li>AI工程化平台搭建</li>
+                            <li>大数据平台架构</li>
+                            <li>计算机视觉（OpenCV/Halcon）</li>
+                            <li>工业视觉检测系统</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-title">工业与硬件</div>
+                        <ul class="skill-list">
+                            <li>SCADA数据采集与监控</li>
+                            <li>工控机软件开发</li>
+                            <li>光源与相机硬件集成</li>
+                            <li>组态软件与自动化</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-title">技术管理</div>
+                        <ul class="skill-list">
+                            <li>技术战略规划与落地</li>
+                            <li>技术团队组建与管理</li>
+                            <li>研发流程体系建设</li>
+                            <li>跨部门协作与项目管理</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <div class="skill-title">行业经验</div>
+                        <ul class="skill-list">
+                            <li>互联网产品（工具/社交/游戏）</li>
+                            <li>金融科技与合规系统</li>
+                            <li>智能硬件与语音OS</li>
+                            <li>工业视觉与自动化</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 核心优势 -->
+            <section class="section">
+                <h2 class="section-title">核心优势</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #1e3c72; margin-bottom: 10px;">🚀 全栈技术能力</h4>
+                        <p style="color: #555; font-size: 14px;">从底层硬件到云端服务，从嵌入式到Web前端，具备端到端技术架构能力</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #1e3c72; margin-bottom: 10px;">💡 产品创新思维</h4>
+                        <p style="color: #555; font-size: 14px;">多次创业经历，擅长从技术视角推动产品创新，平衡技术可行性与商业价值</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #1e3c72; margin-bottom: 10px;">🎯 跨领域适应力</h4>
+                        <p style="color: #555; font-size: 14px;">历经互联网、金融、智能硬件、工业视觉，快速理解行业逻辑并构建技术方案</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <h4 style="color: #1e3c72; margin-bottom: 10px;">👥 团队领导力</h4>
+                        <p style="color: #555; font-size: 14px;">从0到1组建多支技术团队，建立研发规范，培养核心技术骨干</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
