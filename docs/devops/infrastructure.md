@@ -1,7 +1,7 @@
 # 研发与运维体系规划
 
-> 基于腾讯云，面向无人值守健身房系统的小团队 DevOps 方案。  
-> 核心原则：**低成本起步，架构可演进，流程尽量自动化**。
+> 基于腾讯云，面向无人值守健身房系统的 DevOps 方案。  
+> 核心原则：**方案确定、流程稳定、自动化可执行**。
 
 ---
 
@@ -55,7 +55,7 @@ CODING / GitHub（代码仓库）
 | **数据库服务器** | TencentDB for PostgreSQL | 2 核 4G，100G 数据盘 | 托管 PG，免运维，自动备份 |
 | **缓存** | Redis 标准版 | 1G 起 | 托管 Redis，主从高可用 |
 
-> **为什么不用 K8s / TKE**：当前团队规模（2 名工程师）不适合引入 Kubernetes 运维开销，Docker Compose 足够用。等业务规模增长后再迁移。
+> **为什么不用 K8s / TKE**：当前系统采用 Docker Compose，运维路径更直接，部署与故障处理成本更可控。
 
 ---
 
@@ -63,7 +63,7 @@ CODING / GitHub（代码仓库）
 
 | 用途 | 产品 | 说明 |
 |---|---|---|
-| **公网流量入口** | CLB 负载均衡（应用型）| 统一管理域名和 HTTPS 证书，后端挂 CVM；即使只有 1 台服务器，也通过 CLB 统一入口，便于后续扩容 |
+| **公网流量入口** | CLB 负载均衡（应用型）| 统一管理域名和 HTTPS 证书，后端挂 CVM；统一入口便于流量治理与安全策略收敛 |
 | **域名** | DNSPod（腾讯云域名解析）| 解析到 CLB 的 VIP 地址 |
 | **HTTPS 证书** | SSL 证书（免费 DV 型）| 腾讯云免费申请，CLB 上统一终结 TLS，后端 HTTP 通信 |
 | **静态资源加速** | COS + CDN | 前端打包产物（HTML/JS/CSS）存 COS，CDN 全球加速 |
@@ -173,7 +173,7 @@ docs: 补充 API 文档
     └─ main 分支    → ⑤B 等待人工确认 → 部署到生产环境
 ```
 
-### 5.2 GitHub Actions 核心配置（Java 后端示例）
+### 5.2 GitHub Actions 核心配置（Kotlin 后端示例）
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -195,12 +195,12 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
-          cache: maven
+          java-version: '17'
+          cache: gradle
       - name: 运行单元测试
-        run: mvn -B clean test
+        run: ./gradlew clean test --no-daemon
       - name: 构建 JAR
-        run: mvn -B package -DskipTests
+        run: ./gradlew bootJar -x test --no-daemon
       - name: 运行集成测试（容器化依赖）
         run: |
           docker compose -f docker-compose.test.yml up --abort-on-container-exit

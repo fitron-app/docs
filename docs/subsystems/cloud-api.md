@@ -114,28 +114,28 @@ flowchart TD
 
 ---
 
-## 技术选型建议（Java 云端 API）
+## 技术选型建议（Kotlin 云端 API）
 
 | 组件 | 建议方案 | 备注 |
 |---|---|---|
-| 开发语言 | Java 21（LTS） | 统一后端主栈，减少跨语言维护成本 |
-| 后端框架 | Spring Boot 3.x | 单体优先，后续按业务边界拆分服务 |
+| 开发语言 | Kotlin（JDK 17 LTS） | 统一后端主栈，减少跨语言维护成本 |
+| 后端框架 | Spring Boot 3.x | 采用模块化单体架构，边界清晰、实现稳定 |
 | 持久层 | MyBatis-Plus（CRUD）+ MyBatis（复杂 SQL） | 兼顾开发效率与复杂查询可控性 |
 | 数据库迁移 | Flyway | 保证环境间 Schema 变更可追踪、可回滚 |
 | 数据库 | PostgreSQL | 生产级稳定性，适合事务型业务 |
 | 缓存 | Redis | 会话、限流、人脸验证结果缓存 |
-| 消息队列（可选） | RabbitMQ | 处理支付回调、飞书同步等异步任务 |
+| 消息队列 | RabbitMQ | 处理支付回调、飞书同步等异步任务 |
 | MQTT Broker | EMQX（Docker 部署） | 支持大量设备连接 |
-| 对象存储 | 腾讯云 COS | 存储人脸图片原图（可选） |
+| 对象存储 | 腾讯云 COS | 存储人脸图片原图 |
 | API 文档 | springdoc-openapi（Swagger UI） | 自动生成接口文档，便于前后端协作 |
-| 部署方式 | Docker Compose（当前）/ K8s（后续） | 小团队先用 Compose，规模扩大再迁移 |
+| 部署方式 | Docker Compose | 当前生产部署方案，配置与运维路径明确 |
 | 支付集成 | 微信支付 API v3 | 小程序内购买，要求签名验签与幂等处理 |
 
-### Java 工程结构建议
+### Kotlin 工程结构建议
 
 ```text
 cloud-api/
-├── src/main/java/com/eachcan/fitness
+├── src/main/kotlin/com/eachcan/fitness
 │   ├── auth            # 登录鉴权、JWT、权限
 │   ├── user            # 用户、会员状态
 │   ├── face            # 人脸特征与远程验证
