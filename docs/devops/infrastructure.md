@@ -33,9 +33,9 @@ CODING / GitHub（代码仓库）
    │                                  │
    │  CVM（Docker Compose 部署）        │
    │    ├── API 服务容器               │
-   │    ├── Nginx 反向代理容器          │
-   │    └── MQTT Broker 容器（EMQX）   │
+   │    └── Nginx 反向代理容器          │
    │                                  │
+   │  腾讯云托管 MQTT 服务            │
    │  TencentDB for PostgreSQL         │
    │  TencentDB for Redis              │
    │  COS（对象存储，人脸图片等）         │
@@ -308,15 +308,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-
-  emqx:
-    image: emqx/emqx:latest
-    ports:
-      - "1883:1883"    # MQTT
-      - "8083:8083"    # WebSocket
-    environment:
-      - EMQX_NAME=emqx
-    restart: always
 ```
 
 ### 6.3 Nginx 反向代理配置示例

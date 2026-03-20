@@ -38,7 +38,7 @@ cloud-api/
 ├── coupon/          # 优惠券：发放、核验
 ├── hardware/        # 硬件控制：远程开门、灯控指令下发
 ├── analytics/       # 数据分析：报表聚合、飞书多维表格推送
-└── mqtt-broker/     # MQTT Broker 托管（或使用 EMQX 独立部署）
+└── mqtt-broker/     # MQTT Broker 托管（腾讯云托管 MQTT）
 ```
 
 ---
@@ -124,8 +124,8 @@ flowchart TD
 | 数据库迁移 | Flyway | 保证环境间 Schema 变更可追踪、可回滚 |
 | 数据库 | PostgreSQL | 生产级稳定性，适合事务型业务 |
 | 缓存 | Redis | 会话、限流、人脸验证结果缓存 |
-| 消息队列 | RabbitMQ | 处理支付回调、飞书同步等异步任务 |
-| MQTT Broker | EMQX（Docker 部署） | 支持大量设备连接 |
+| 消息队列 | MQTT 事件通道（腾讯云托管 MQTT） | 设备侧长连接事件与指令下发 |
+| MQTT Broker | 腾讯云托管 MQTT | 设备侧长连接接入 |
 | 对象存储 | 腾讯云 COS | 存储人脸图片原图 |
 | API 文档 | springdoc-openapi（Swagger UI） | 自动生成接口文档，便于前后端协作 |
 | 部署方式 | Docker Compose | 当前生产部署方案，配置与运维路径明确 |
@@ -146,7 +146,7 @@ cloud-api/
 │   ├── hardware        # 远程开门、灯控指令
 │   ├── analytics       # 报表聚合、飞书同步
 │   ├── common          # 通用异常、响应体、工具类
-│   └── infrastructure  # DB/Redis/MQTT/消息队列适配
+│   └── infrastructure  # DB/Redis/MQTT 适配
 └── src/main/resources
     ├── application.yml
     ├── mapper/
