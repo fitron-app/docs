@@ -22,7 +22,15 @@ export default withMermaid(defineConfig({
             { text: '概览', link: '/subsystems/' },
             { text: '工控机子系统', link: '/subsystems/industrial-pc' },
             { text: '云端 API 服务', link: '/subsystems/cloud-api' },
-            { text: '管理后台 Web', link: '/subsystems/admin-web' },
+            {
+              text: '管理后台 Web',
+              collapsed: true,
+              items: [
+                { text: '概览', link: '/subsystems/admin-web' },
+                { text: '门店管理', link: '/subsystems/admin-web/stores' },
+                { text: '会员管理', link: '/subsystems/admin-web/members' },
+              ],
+            },
             { text: '微信小程序', link: '/subsystems/mini-program' },
             { text: '飞书多维表格', link: '/subsystems/feishu-bitable' },
           ],
