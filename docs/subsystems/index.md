@@ -24,7 +24,7 @@ graph LR
 |---|---|---|---|
 | [工控机子系统](./industrial-pc) | 门店本地 Linux/Windows | 硬件端负责人 | MQTT、HTTP、GPIO |
 | [云端 API 服务](./cloud-api) | 云服务器（Kotlin + Spring Boot） | 后端程序员 | REST、MQTT Broker |
-| [管理后台 Web](./admin-web) | 浏览器（PC 端） | 前端程序员 | REST |
+| [管理后台 Web](./admin-web) | 浏览器（PC + 移动端适配） | 前端程序员 | REST |
 | [微信小程序](./mini-program) | 用户手机 | 前端程序员 | REST、WebSocket |
 | [飞书多维表格](./feishu-bitable) | 飞书平台（SaaS） | 后端程序员（同步任务） | 飞书开放平台 API |
 
