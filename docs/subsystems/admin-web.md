@@ -139,17 +139,24 @@
 
 ---
 
-## 技术选型建议
+## 技术选型建议（Nuxt UI）
+
+管理台希望**视觉与交互更现代**、且兼顾 **PC + 移动端**，建议采用 **Nuxt 3 + Nuxt UI** 作为主栈；文档站仍可为 VitePress，二者同属 Vue 生态，组件不强制复用。官方文档：[Nuxt UI](https://ui.nuxt.com)。
 
 | 组件 | 建议方案 | 备注 |
 |---|---|---|
-| 框架 | Vue 3 + TypeScript | 与 VitePress 生态一致 |
-| UI 组件库 | Ant Design Vue 或 Element Plus | 选带 **移动端适配**或配套移动组件库的栈；窄屏下表格策略单独验收 |
-| 状态管理 | Pinia | Vue 3 推荐方案；门店上下文持久化见 [门店上下文系统](../functional-systems/admin-store-context) |
-| 图表库 | ECharts 或 Apache ECharts Vue | 数据分析页面；移动端简化维度 |
-| 构建工具 | Vite | 开发体验好，AI 生成代码兼容 |
-| HTTP 客户端 | Axios | 标准选型 |
-| 实时状态 | WebSocket 或 SSE | 硬件状态实时推送 |
+| 框架 | **Nuxt 3** + TypeScript | 约定式路由、布局、中间件，适合后台多模块；内部使用可按需关闭 SSR（如仅 `ssr: false` 或按路由规则），便于对接浏览器端 WS、长连接与纯前端会话 |
+| UI 与样式 | **Nuxt UI**（`@nuxt/ui`）+ **Tailwind CSS** | 设计语言统一、默认观感优于传统企业组件库；内置响应式、暗色模式、无障碍基础；复杂表格用 **UTable** 或 **TanStack Table** + Nuxt UI 原子组件拼装 |
+| 状态管理 | **Pinia**（`@pinia/nuxt`） | 门店上下文、用户信息、筛选条件；持久化策略与 [门店上下文系统](../functional-systems/admin-store-context) 一致 |
+| 数据请求 | **`$fetch` / `useFetch`**（ofetch） | Nuxt 内置，可封装统一 baseURL、JWT 注入、错误与 401 处理；若团队更熟 Axios 也可并存 |
+| 表单与校验 | **Zod** + Nuxt UI 表单模式 | 与 TypeScript 类型对齐，减少手写校验分支 |
+| 图表 | **ECharts** + **vue-echarts**（或等价封装） | 数据分析页；移动端减少系列数量、优先单图单指标 |
+| 图标 | **Nuxt Icon**（Iconify） | 与 Nuxt UI 搭配成本低 |
+| 构建 | **Vite**（Nuxt 内置） | — |
+| 实时状态 | **WebSocket** 或 **SSE** | 硬件状态推送；注意与 SSR 关闭策略、断线重连与页面可见性 |
+| 质量与体验 | ESLint + Prettier、Vitest（可选） | 表格/财务导出等关键路径可补 e2e（Playwright） |
+
+**为何不优先 Ant Design Vue / Element Plus**：二者偏「传统企业后台」视觉路径，定制主题后仍易同质化；Nuxt UI + Tailwind 更易做出**品牌一致、信息密度可控**的界面，且移动端断点下用同一套 token 收敛样式成本更低。
 
 ---
 
