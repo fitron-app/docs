@@ -11,6 +11,7 @@ export default withMermaid(defineConfig({
       { text: '首页', link: '/' },
       { text: '子系统', link: '/subsystems/' },
       { text: '功能系统', link: '/functional-systems/' },
+      { text: '技术方案', link: '/technical-solutions/' },
       { text: '硬件', link: '/hardware/bom' },
       { text: '工期规划', link: '/planning/work-breakdown' },
     ],
@@ -69,6 +70,17 @@ export default withMermaid(defineConfig({
           items: [
             { text: '工作内容梳理（WBS）', link: '/planning/work-breakdown' },
             { text: '工期预期', link: '/planning/timeline' },
+          ],
+        },
+      ],
+      '/technical-solutions/': [
+        {
+          text: '技术方案',
+          items: [
+            { text: '概览', link: '/technical-solutions/' },
+            { text: 'A/B 包 OTA 升级', link: '/technical-solutions/ota-upgrade' },
+            { text: '三级看门狗', link: '/technical-solutions/watchdog' },
+            { text: '远程 SSH 运维通道', link: '/technical-solutions/remote-ssh' },
           ],
         },
       ],
