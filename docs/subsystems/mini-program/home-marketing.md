@@ -31,12 +31,35 @@
 
 ### 1. 品牌视觉区（首屏 Hero）
 
+> 首屏 Banner 支持按用户标签进行**分层运营**，不同用户群体看到不同的 Banner 内容。
+
 | 要素 | 说明 |
 |---|---|
-| 品牌背景图 | 全宽大图（建议比例 16:9），展示门店环境、健身场景等品牌形象 |
+| 品牌 Banner | 全宽大图（建议比例 16:9），展示品牌形象或促销活动 |
 | 品牌叠加层 | 半透明渐变遮罩，底部叠加文字信息 |
-| 品牌 Slogan | 如「24H 无人智能健身，随时随地开练」 |
-| 门店切换 | 点击切换当前查看的门店（弹出门店选择器） |
+| 品牌 Slogan | 如「24H 无人智能健身，随时随地开练」（运营可配置） |
+| 门店切换 | 右上角切换当前查看的门店（弹出门店选择器） |
+
+**Banner 分层运营规则**：
+
+管理后台可为 Banner 配置**适用人群标签**，前端根据用户标签匹配展示：
+
+| 人群标签 | 说明 | Banner 示例 |
+|---|---|---|
+| 新用户 | `tags` 包含 `NEW_USER` | 「新人首月 19.9 元，限时体验」 |
+| 未购卡用户 | `tags` 包含 `NO_MEMBERSHIP` | 「月卡 99 元起，全城通用」 |
+| 活跃用户 | `tags` 包含 `ACTIVE`（近 30 天到店 ≥ 3 次） | 「连续打卡 7 天，赠送额外淋浴时长」 |
+| 沉默用户 | `tags` 包含 `SILENT`（近 30 天未到店） | 「好久不见！回来就送 3 天体验卡」 |
+| 即将到期 | `tags` 包含 `EXPIRING_SOON` | 「续费年卡享 8 折优惠」 |
+| VIP 用户 | `tags` 包含 `VIP` | 「VIP 专属：私教课程免费体验 1 次」 |
+| 全部用户 | 默认，无标签过滤 | 品牌形象图 / 通用活动 |
+
+**Banner 匹配优先级**：
+
+1. 精确匹配用户标签的 Banner（优先展示）
+2. 「全部用户」Banner（兜底）
+3. 同优先级内按管理后台排序值排列
+4. 最多展示 1 张首屏 Banner（与下方活动轮播区分）
 
 **门店选择器**（底部弹窗）：
 
@@ -307,6 +330,18 @@ GET /api/v1/products/recommend
 GET /api/v1/activities/banners
   Query: { storeId? }
   Response: { items: ActivityBanner[] }
+
+# 首屏 Hero Banner（分层运营）
+GET /api/v1/config/hero-banner
+  Auth: JWT（未登录时传匿名 token 或不传）
+  Query: { storeId }
+  Response: {
+    image: string,          // Banner 图片 URL
+    slogan: string,         // 文案
+    jumpType: string,       // none / product / activity / link
+    jumpTarget: string,     // 跳转目标 ID 或 URL
+    tagFilter: string[]     // 后台配置的适用人群标签
+  }
 ```
 
 ---
@@ -325,6 +360,7 @@ GET /api/v1/activities/banners
 | 温湿度传感器 | 门店管理 → 设备管理 | 传感器绑定 + 告警阈值 |
 | 推荐套餐排序 | 产品管理 → 产品列表 | 按门店配置推荐权重 |
 | 活动 Banner | 营销 → 活动管理 | 图片 + 跳转配置 |
+| 首屏 Hero Banner | 营销 → Banner 管理 | 图片 + Slogan + 跳转 + **适用人群标签** |
 | 店长企微信息 | 门店管理 → 基本资料 | 企微姓名、头像、二维码 |
 
 ---
