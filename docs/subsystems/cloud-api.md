@@ -81,6 +81,29 @@ cloud-api/
   GET    /api/v1/device/config          # 拉取设备配置
 ```
 
+### 多语言接口约定（新增）
+
+- 用户端 API 请求支持 `Accept-Language`（`zh` / `en`），缺省默认 `zh`
+- 用户端接口返回**已按语言解析后的字符串**
+- 管理端接口返回**完整多语言对象**（如 `{ "zh": "月卡", "en": "Monthly Pass" }`），用于后台编辑
+- 解析回落规则：`请求语言 -> zh -> 任意有值语言 -> 空字符串`
+
+示例：
+
+```http
+GET /api/v1/products
+Accept-Language: en
+```
+
+```json
+{
+  "id": "prod_001",
+  "name": "Monthly Pass",
+  "description": "Unlimited monthly access",
+  "price": 299.00
+}
+```
+
 ---
 
 ## 人脸远程验证流程
@@ -111,6 +134,20 @@ flowchart TD
 | `coupons` | 优惠券定义 |
 | `user_coupons` | 用户优惠券（发放、使用记录） |
 | `device_logs` | 设备事件日志（门状态、告警等） |
+
+### 多语言字段设计（新增）
+
+系统中面向用户展示的可译字段，统一采用 `JSONB` 存储多语言内容（示例：`{"zh":"月卡","en":"Monthly Pass"}`）：
+
+| 表名 | 可译字段 | 存储类型 |
+|---|---|---|
+| `products` | `name`, `description` | `JSONB` |
+| `stores` | `name`, `address`, `description` | `JSONB` |
+| `coupons` | `name`, `description` | `JSONB` |
+
+说明：
+- `users`、`orders`、`checkins`、`device_logs` 等业务流水数据不做多语言改造
+- 第一期要求 `zh`、`en` 双语必填，后续扩展语言不改表结构
 
 ---
 

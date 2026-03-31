@@ -51,6 +51,7 @@ export default withMermaid(defineConfig({
             { text: '淋浴系统', link: '/functional-systems/shower-system' },
             { text: '硬件控制系统', link: '/functional-systems/hardware-control' },
             { text: '数据分析系统', link: '/functional-systems/analytics' },
+            { text: '多语言系统（i18n）', link: '/functional-systems/i18n' },
           ],
         },
       ],
