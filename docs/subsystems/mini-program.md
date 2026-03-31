@@ -109,7 +109,7 @@
 - 动作详情（图文/视频）
 - 收藏功能
 
-> 详细 PRD：[首页、门店与营销页面 — 动作库](./mini-program/pages-home-marketing#动作库)
+> 详细 PRD：[动作库](./mini-program/home-marketing#动作库)
 
 ---
 
