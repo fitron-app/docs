@@ -41,7 +41,8 @@
 Product {
   id                        String       # 产品唯一标识
   storeId                   String?      # 所属门店（null = 通用产品）
-  name                      String       # 产品名称
+  name                      JsonObject   # 产品名称（多语言：{zh,en}）
+  description               JsonObject?  # 产品描述（多语言：{zh,en}）
   type                      Enum         # monthly / times / experience / seasonal
   price                     Decimal      # 售价（元）
   originalPrice             Decimal?     # 划线价（展示用）
@@ -55,6 +56,13 @@ Product {
   updatedAt                 DateTime
 }
 ```
+
+### 多语言字段说明（新增）
+
+- `name`、`description` 由单语言 `String` 改为多语言对象（JSONB）
+- 用户端 API 根据 `Accept-Language` 返回解析后的文本
+- 管理端 API 返回完整语言对象用于编辑
+- 第一阶段要求 `zh`、`en` 必填
 
 ---
 
