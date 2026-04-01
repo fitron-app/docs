@@ -207,6 +207,30 @@ const storeModules = [
 | 所在城市 | `city` | String | ✅ | ✅ (zh/en) | 省 → 市 → 区 |
 | 门店简介 | `description` | Text | ❌ | ✅ (zh/en) | 富文本，用于小程序门店详情页展示 |
 
+#### 闲时时段配置
+
+> 用于闲时卡产品的进店时段校验。每个门店可独立配置自己的闲时时段。
+
+```typescript
+interface StoreOffPeakConfig {
+  isEnabled: boolean           // 是否启用闲时卡功能
+  offPeakSlots: {              // 闲时时段列表，可配置多条
+    dayOfWeek: 1-7             // 周几（1=周一, 7=周日）
+    startTime: string          // 如 "06:00"
+    endTime: string            // 如 "14:00"
+  }[]
+}
+```
+
+**门店基本信息 Tab 中增加的配置字段**：
+
+| 字段 | key | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| 启用闲时卡 | `offPeakEnabled` | Boolean | ✅ | 开启后该门店支持闲时卡产品 |
+| 闲时时段 | `offPeakSlots` | Array | 条件必填 | 启用闲时卡后必填至少一条 |
+
+> **角色权限**：闲时时段配置由 boss 编辑，店长只读。属于门店维度的运营策略配置。
+
 #### 营业时间详细定义
 
 ```typescript
