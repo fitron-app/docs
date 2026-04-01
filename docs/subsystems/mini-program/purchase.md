@@ -28,8 +28,7 @@
     │
     ├─ 点击购买 → 订单确认页
     │                │
-    │                ├─ 选择优惠券（可选）
-    │                ├─ 金额实时刷新
+    │                ├─ 确认金额
     │                ├─ 点击「立即支付」
     │                │
     │                ├─ POST /api/v1/orders
@@ -73,22 +72,14 @@
 ### 确认订单页要素
 
 - 产品信息区：名称、有效期、次数
-- 优惠券选择区：已选优惠券摘要 + 「选择优惠券」入口
-- 金额明细：原价、优惠、应付金额
+- 金额明细：产品售价
 - 「立即支付」按钮 + 服务协议提示
-
-### 优惠券选择弹窗
-
-- Tab 切换：可用 / 不可用
-- 每张券展示：券面金额、使用条件、有效期
-- 不可用券展示原因（如「未达门槛（还差 ¥111）」）
-- 底部「不使用优惠券」选项
 
 ### 支付结果页
 
 **支付成功**：
 - 成功图标 + 文案
-- 产品名称、有效期、已优惠金额
+- 产品名称、有效期
 - 未录脸时显示「完成人脸录入」按钮（强引导）
 - 「查看我的会员」+ 「返回首页」
 
@@ -101,7 +92,6 @@
 
 | 异常 | 处理 |
 |---|---|
-| 优惠券失效 | 即时提示并刷新金额 |
 | 取消支付 | 订单保持 PENDING，可在订单列表继续支付 |
 | 支付结果未回传 | 轮询订单状态（间隔 2s，最多 5 次） |
 | 待支付超时 | 不可继续支付，显示「已取消」 |
@@ -115,7 +105,7 @@ GET /api/v1/products?storeId=xxx
 
 POST /api/v1/orders
   Auth: JWT
-  Body: { productId: string, couponId?: string }
+  Body: { productId: string }
   Response: {
     orderId: string,
     payParams: { timeStamp, nonceStr, package, signType, paySign },  // wx.requestPayment 参数
@@ -123,8 +113,5 @@ POST /api/v1/orders
   }
 
 GET /api/v1/orders/:id
-  Response: Order { status, product, amount, discount, paidAt, ... }
-
-GET /api/v1/user/coupons/available?productId=xxx
-  Response: { items: Coupon[] }
+  Response: Order { status, product, amount, paidAt, ... }
 ```
