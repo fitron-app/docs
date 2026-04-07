@@ -9,7 +9,7 @@ graph LR
     IPC["工控机子系统\n（门店本地运行）"]
     Cloud["云端 API 服务\n（云服务器运行）"]
     AdminWeb["管理后台 Web\n（浏览器访问）"]
-    MiniProgram["微信小程序\n（用户手机端）"]
+    MiniProgram["微信小程序体系\n（客户端 + 店长端）"]
     Feishu["飞书多维表格\n（SaaS，老板/财务）"]
 
     IPC <-->|"MQTT / HTTP"| Cloud
@@ -25,14 +25,14 @@ graph LR
 | [工控机子系统](./industrial-pc) | 门店本地 Linux/Windows | 硬件端负责人 | MQTT、HTTP、GPIO |
 | [云端 API 服务](./cloud-api) | 云服务器（Kotlin + Spring Boot） | 后端程序员 | REST、MQTT Broker |
 | [管理后台 Web](./admin-web) | 浏览器（PC + 移动端适配） | 前端程序员 | REST |
-| [微信小程序](./mini-program) | 用户手机 | 前端程序员 | REST、WebSocket |
+| [微信小程序体系](./mini-program) | 微信小程序（客户端 + 店长端） | 前端程序员 | REST、WebSocket |
 | [飞书多维表格](./feishu-bitable) | 飞书平台（SaaS） | 后端程序员（同步任务） | 飞书开放平台 API |
 
 ## 子系统间通信规则
 
 - **工控机 ↔ 云端 API**：工控机订阅 MQTT topic 接收指令，同时通过 HTTP 上报状态和事件
 - **管理后台 ↔ 云端 API**：标准 REST API，JWT 鉴权，仅内部管理员可访问
-- **小程序 ↔ 云端 API**：标准 REST API，微信 openId 鉴权
+- **小程序 ↔ 云端 API**：标准 REST API，微信身份登录 + 服务端角色鉴权
 - **云端 API → 飞书多维表格**：后端定时任务调用飞书开放平台 API 写入数据，单向推送
 - **工控机本地**：通过 GPIO/RS485/继电器与硬件设备通信，无需经过云端
 
