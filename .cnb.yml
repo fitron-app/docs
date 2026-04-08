@@ -5,3 +5,13 @@ main:
     # 参考：https://docs.cnb.cool/en/build/env.html#importing-environment-variables
     - imports: https://cnb.cool/fitron.app/fitron-docs/-/blob/main/envs.yml
       stages:
+        # 构建当前项目
+        - name: Build Current Project
+          image: node:20
+          script: node -v && npm install && npm run docs:build
+        # 将构建输出部署到 EdgeOne Pages
+        # .output/public 目录由前一步 nuxt generate 生成
+        # 参考：https://www.npmjs.com/package/edgeone
+        - name: Deploy to EdgeOne Pages
+          image: node:20
+          script: npx edgeone pages deploy docs/.vitepress/dist -n fitron-docs -t $EDGEONE_API_TOKEN
