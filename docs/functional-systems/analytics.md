@@ -12,6 +12,61 @@
 
 ---
 
+## 财务分析
+
+财务分析是数据分析系统的核心模块，面向老板和财务人员，提供多维度的财务数据统计。
+
+### 收入统计
+
+按**渠道**（微信支付 / 美团 / 抖音 / 其他）× **门店** × **时间周期**（日/周/月/季/年）汇总实际支付金额。
+
+```
+GET /api/v1/admin/analytics/finance/revenue
+  ?storeId=all|<storeId>
+  &channel=all|wechat|meituan|douyin
+  &period=day|week|month|quarter|year
+  &startDate=2026-01-01
+  &endDate=2026-03-31
+  &groupBy=day|week|month
+```
+
+| 维度 | 说明 |
+|---|---|
+| 各渠道收入 | 微信自购 / 美团核销 / 抖音核销 分渠道汇总 |
+| 各门店收入 | 按门店汇总，支持横向对比 |
+| 按时间周期 | 日/周/月/季/年粒度灵活切换 |
+| 产品类型拆分 | 体验卡 / 单店卡 / 跨店卡 / 洗浴卡 各自占比 |
+
+### 结算金额统计
+
+结算金额 = 收入 - 平台手续费 - 优惠券补贴（如有）。
+
+| 渠道 | 结算逻辑 |
+|---|---|
+| 微信支付 | 收入直接到账，微信支付手续费按比例扣除 |
+| 美团 | 美团按核销金额结算，扣除佣金后到账 |
+| 抖音 | 抖音按核销金额结算，扣除佣金后到账 |
+
+```
+GET /api/v1/admin/analytics/finance/settlement
+  ?storeId=all|<storeId>
+  &channel=all|wechat|meituan|douyin
+  &period=day|week|month|quarter|year
+```
+
+### 退款统计
+
+按**渠道** × **门店** × **时间周期**统计退款金额与笔数。
+
+```
+GET /api/v1/admin/analytics/finance/refunds
+  ?storeId=all|<storeId>
+  &channel=all|wechat|meituan|douyin
+  &period=day|week|month|quarter|year
+```
+
+---
+
 ## 核心分析维度
 
 ### 经营概览（Dashboard）
