@@ -9,9 +9,42 @@ main:
         - name: Build Current Project
           image: node:20
           script: node -v && npm install && npm run docs:build
-        # 将构建输出部署到 EdgeOne Pages
-        # .output/public 目录由前一步 nuxt generate 生成
-        # 参考：https://www.npmjs.com/package/edgeone
-        - name: Deploy to EdgeOne Pages
-          image: node:20
-          script: npx edgeone pages deploy docs/.vitepress/dist -n fitron-docs -t $EDGEONE_API_TOKEN
+        # 将构建输出部署到腾讯云服务器（宝塔面板）
+        - name: Deploy to Tencent Cloud Server
+          image: cnbcool/ssh
+          settings:
+            # 以下两种方式传递 host 均可
+            host: 
+              - 62.234.91.201
+            # host: xx.xx.xx.xxx,xx.xx.xx.xxx
+            port: 22
+            username: root
+            key: |
+              -----BEGIN RSA PRIVATE KEY-----
+              MIIEpAIBAAKCAQEAuEb2FFy0jd//Kwp7IszsLGydhYZ6GEH/Pc5ZyrPOoUPmogDk
+              j2jY8k7eHId8h2TvCekUYYrlK9QkIueu/i2deDNriN0CM+BJ7bzX8NhtgBcgJQoW
+              RccG2NtpirLbalMRIQTFAkDA4Kb8hV/6GnzSeYxm5j85ffQnBkcL5cLTT39Fu0B2
+              zdr2ogX95gVnfvrXu+LvsNKw7BF1TiftIcO3YgFIz+Hrc2UBSGoRfkTwicqzqUhh
+              PRufwKET4m4l4MCZve0wudvh0ojqE2YTcT70nUd9qjTdRTdYgV2sBFQ4+clywUQL
+              8w343OgCZvHkKwGpdU4Od4e8hQgFexhvtVZviwIDAQABAoIBADacYQT7zE5XWamJ
+              u6A+lqc7sRsHFVvnAxtv8dBOpSfJlanhFdsiOVjl4pEV3ePKF8UaG/4kSXJJtkPZ
+              4VRWdFpQ8sdmp+Zzy7T2yBAKM7lIITCY4qzfJLpTm92Mz9WctHDSlwfp5L8u/ZsR
+              LG95Gm8HGt+VURZwqrgDihUXPcRK8761hYnwVNmWWDZ4gdkVMaRBjelHqeyPCKaD
+              Z+aEtltDNIDOZekQvz6ED7l69iUQu+WN/3cKaJrWXjGSHIvnvlqjiqvYGviEWu8n
+              RJVwQuWmiMEmrnOe30AAue2vilcjJctNMiTTBZgyXs+R+j/ws0Uli8Mjczt6JRhg
+              0wy5qFECgYEAv3hy3LR5M+YEXsBucAWYxIZ87RtufDfidg+jx9PlyX7Sa4kww0N/
+              Gq0VNouJJ8B+JOwTysA2oApjx0uNRSXWTLgv7h6VNvXFR0k3s+fbzYVE9PkajFm5
+              Al4lZQ+rx55Uw/9AZdA+DQMyXcfNnEaSebjnMUcXKs4vTW9h4wW4cBUCgYEA9mHk
+              t9DqMwK4Lh9wGujuyPsYvcSjMeFULX0mtr5YShn+wc6TVQ/i1rhkMdfIXSaHhDDG
+              9jhvOAEe4+8AiXIgVtmwpFaKWpvRRa+okFl6B8btpmfggoCoZgWx4qS1n5ZGnb+g
+              7l4BbF/x0FtUIUX17q1JJGjxjYlu69cETFe3qR8CgYEAiTDWrEkr5wHS88lR2DZK
+              ZdYvQP08xwiL3SgLpCyyIxQZ1S9xnxeHxSdrYa/NUIxeVjpJXCcpfLa1E6GQ0ZDw
+              4fu/bBDBvaWP+yn9HYzuM25gIF80pIfNRmMKzETUQq2x8tW74Le7HjvCJOv66RSv
+              80OHdAmKEgO2ZPd/3djFdJkCgYEA0513Fc4xKUj/qlXEMsi4NxU7xdo7lN8FLuDc
+              PH82U8cKAaoM7zVqzqOnIwxEAoXSRV6jtNz54a9MudcQrfzA+/eTeUL/KB3G28So
+              0fqYDk/01EVKFqysdpwTkieH+57V3i216qYBMPUjO6MFmmJ9fdeGB+i+96MACz4t
+              aei5TV8CgYBJnedaBSIsNf9B9dK8gpnjTgkdW1yNX/GzmjAhx/ZjnI1faeaJUjDH
+              SaSU00hfLyL4g6Q/COr05w+Jf+2LDWL0+ulZoVfbvr7vjuGLq9JNATSvPUVNonRv
+              yD/tiZK03nlw/uS6FT6cZfs3TxXvv0zxw2V311xnYJ1i4qwQLwCdUg==
+              -----END RSA PRIVATE KEY-----
+            script: scp -r docs/.vitepress/dist/* root@62.234.91.201:/www/wwwroot/fitron-docs.hm5.com/
