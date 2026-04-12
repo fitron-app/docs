@@ -47,4 +47,4 @@ main:
               SaSU00hfLyL4g6Q/COr05w+Jf+2LDWL0+ulZoVfbvr7vjuGLq9JNATSvPUVNonRv
               yD/tiZK03nlw/uS6FT6cZfs3TxXvv0zxw2V311xnYJ1i4qwQLwCdUg==
               -----END RSA PRIVATE KEY-----
-            script: scp -r docs/.vitepress/dist/* root@62.234.91.201:/www/wwwroot/fitron-docs.hm5.com/
+            script: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r docs/.vitepress/dist/* root@62.234.91.201:/www/wwwroot/fitron-docs.hm5.com/
