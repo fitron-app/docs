@@ -298,7 +298,8 @@ services:
     environment:
       - DB_URL=${DB_URL}
       - REDIS_URL=${REDIS_URL}
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_PRIVATE_KEY_PATH=${JWT_PRIVATE_KEY_PATH}
+      - JWT_PUBLIC_KEY_PATH=${JWT_PUBLIC_KEY_PATH}
       - WX_APP_ID=${WX_APP_ID}
       - WX_APP_SECRET=${WX_APP_SECRET}
       - MQTT_BROKER_URL=${MQTT_BROKER_URL}
@@ -395,7 +396,7 @@ server {
 | SSH 密钥登录 | 禁用密码登录，所有 SSH 访问走密钥认证 |
 | 密钥不入库 | 所有密码、Token、密钥通过环境变量注入，存放在 GitHub Secrets / CODING 密钥管理 |
 | 镜像扫描 | TCR 开启镜像漏洞扫描，推送时自动检测 |
-| 定期轮换 | 数据库密码、JWT Secret、微信密钥每季度轮换一次 |
+| 定期轮换 | 数据库密码、JWT RS256 密钥对、微信密钥每季度轮换一次 |
 
 ---
 

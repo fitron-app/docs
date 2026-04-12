@@ -34,7 +34,7 @@
          ├─ 点击「微信一键登录」
          │
          ├─ 静默调用 wx.login 获取 code
-         ├─ POST /api/v1/auth/wx-login → 获取 token
+         ├─ POST /api/v1/auth/consumer/wx-login → 获取 token
          │
          ├─ 弹出手机号授权弹窗（Button open-type="getPhoneNumber"）
          │   │
@@ -115,12 +115,12 @@
 
 | 数据 | 接口 | 用途 |
 |---|---|---|
-| 用户资料 | `GET /api/v1/user/profile` | 昵称、头像、手机号 |
+| 消费者资料 | `GET /api/v1/consumer/profile` | 昵称、头像、手机号 |
 | 人脸状态 | `profile.faceEnrolled` | 决定是否引导录脸 |
-| 会员权益摘要 | `GET /api/v1/user/membership` | 首页会员卡片、状态提醒 |
+| 会员权益摘要 | `GET /api/v1/consumer/membership` | 首页会员卡片、状态提醒 |
 | 待支付订单 | `GET /api/v1/orders?status=PENDING` | 首页待支付提醒 |
 | 新人福利配置 | `GET /api/v1/config/welcome-gift` | 判断是否弹出新人福利 |
-| 用户标签 | `profile.tags` | 判断是否新用户（用于 Banner 分层） |
+| 消费者标签 | `profile.tags` | 判断是否新用户（用于 Banner 分层） |
 
 ---
 
@@ -318,18 +318,19 @@
 ## 接口
 
 ```text
-# 微信登录
-POST /api/v1/auth/wx-login
+# 消费者微信登录
+POST /api/v1/auth/consumer/wx-login
   Body: { code: string }
   Response: {
-    token: string,
+    accessToken: string,
+    refreshToken: string,
     isNewUser: boolean,
-    user: { id, nickname, avatarUrl, faceEnrolled: boolean, tags: string[] }
+    consumer: { id, nickname, avatarUrl, faceEnrolled: boolean, tags: string[] }
   }
 
 # 绑定手机号
-POST /api/v1/auth/bind-phone
-  Auth: JWT
+POST /api/v1/auth/consumer/bind-phone
+  Auth: JWT（iss: consumer）
   Body: { code: string }  // getPhoneNumber 返回的 code
   Response: {
     success: boolean,

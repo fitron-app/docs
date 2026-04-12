@@ -11,7 +11,7 @@
 云端 API 服务是整个系统的**核心枢纽**，所有业务数据的权威来源均在此处。
 
 **云端 API 负责：**
-- 用户注册、登录、鉴权（微信 openId + JWT）
+- 三套用户体系（消费者/教练/管理人员）的注册、登录、鉴权（JWT RS256）
 - 产品、订单、优惠券的完整生命周期管理
 - 人脸特征向量的存储与远程验证（工控机本地库无记录时的回退）
 - 向工控机下发控制指令（通过 MQTT）
@@ -29,8 +29,10 @@
 
 ```
 cloud-api/
-├── auth/            # 鉴权：微信 openId 换 JWT，管理员账号体系
-├── user/            # 用户管理：注册、信息、会员状态
+├── auth/            # 鉴权：三套用户体系独立登录、JWT RS256 签发
+├── consumer/        # 消费者管理：注册、信息、会员状态
+├── staff/           # 管理人员：账号、角色、门店权限
+├── coach/           # 教练管理（规划中）
 ├── face/            # 人脸服务：特征向量存储、远程验证接口
 ├── store/           # 门店管理：多店配置、设备绑定
 ├── product/         # 产品/套餐：定价、有效期规则
@@ -47,38 +49,47 @@ cloud-api/
 
 ### 鉴权方式
 
-| 调用方 | 鉴权方式 | 说明 |
-|---|---|---|
-| 微信小程序 | `wx.login` 换取 `code` → 后端换 `openId` → 签发 JWT | 用户身份 |
-| 管理后台 Web | 账号密码登录 → 签发 JWT（角色：admin/finance/store_manager） | 管理员身份 |
-| 工控机 | API Key（每台设备独立 Key，绑定门店） | 设备身份 |
+三套用户体系使用**独立的登录入口和数据表**，JWT 只携带 `sub`（用户ID）和 `iss`（体系标识），权限数据在服务端通过 Redis 查询。详见 [接口通信安全](/functional-systems/basics/api-security)。
+
+| 调用方 | 鉴权方式 | 查询的表 | 说明 |
+|---|---|---|---|
+| 用户端小程序 | `wx.login` → `openId` → JWT（`iss: consumer`） | `consumer` | 消费者身份 |
+| 店长端小程序 | `wx.login` → `openId` → JWT（`iss: staff`）+ HMAC | `staff` | 管理人员身份 |
+| 客服后台 | 账号密码 + TOTP 2FA → JWT（`iss: staff`）+ HMAC | `staff` | 管理人员身份 |
+| 教练端（规划中） | `wx.login` → `openId` → JWT（`iss: coach`） | `coach` | 教练身份 |
+| 工控机（HTTP） | mTLS 客户端证书（私有 CA 签发） | — | 设备身份 |
+| 工控机（MQTT） | IoT Explorer 设备密钥认证 | — | 设备身份 |
 
 ### REST 接口规范
 
 ```
 基础路径: /api/v1/
 
-用户端接口:
-  POST   /api/v1/auth/wx-login          # 微信登录
-  GET    /api/v1/user/profile           # 用户信息
-  POST   /api/v1/user/face/enroll       # 人脸录入（上传特征向量）
-  GET    /api/v1/products               # 产品列表
-  POST   /api/v1/orders                 # 创建订单
-  GET    /api/v1/orders/{id}            # 订单详情
-  POST   /api/v1/coupons/verify         # 核销优惠券
+消费者端接口（用户端小程序）:
+  POST   /api/v1/auth/consumer/wx-login    # 消费者微信登录
+  POST   /api/v1/auth/consumer/bind-phone  # 绑定手机号
+  GET    /api/v1/consumer/profile          # 消费者信息
+  POST   /api/v1/consumer/face/enroll      # 人脸录入（上传特征向量）
+  GET    /api/v1/consumer/membership       # 会员状态查询
+  GET    /api/v1/products                  # 产品列表
+  POST   /api/v1/orders                    # 创建订单
+  GET    /api/v1/orders/{id}               # 订单详情
+  POST   /api/v1/coupons/verify            # 核销优惠券
 
-管理端接口:
-  GET    /api/v1/admin/stores           # 门店列表
-  GET    /api/v1/admin/users            # 用户列表
-  GET    /api/v1/admin/orders           # 订单列表
-  POST   /api/v1/admin/hardware/door    # 远程开门
-  POST   /api/v1/admin/hardware/light   # 远程灯光控制
-  GET    /api/v1/admin/analytics/...    # 数据报表
+管理端接口（店长端小程序 + 客服后台）:
+  POST   /api/v1/auth/staff/wx-login       # 管理人员微信登录（店长端）
+  POST   /api/v1/auth/staff/password-login # 管理人员密码登录（客服后台）
+  GET    /api/v1/staff/stores              # 当前管理人员的门店列表
+  GET    /api/v1/staff/consumers           # 消费者列表
+  GET    /api/v1/staff/orders              # 订单列表
+  POST   /api/v1/staff/hardware/door       # 远程开门
+  POST   /api/v1/staff/hardware/light      # 远程灯光控制
+  GET    /api/v1/staff/analytics/...       # 数据报表
 
-设备端接口（工控机调用）:
-  POST   /api/v1/device/face/verify     # 人脸远程验证
-  POST   /api/v1/device/events          # 上报事件（进出记录等）
-  GET    /api/v1/device/config          # 拉取设备配置
+设备端接口（工控机调用，mTLS 认证）:
+  POST   /api/v1/ipc/face/verify           # 人脸远程验证
+  POST   /api/v1/ipc/event                 # 上报事件（进出记录等）
+  GET    /api/v1/ipc/config                # 拉取设备配置
 ```
 
 ### 多语言接口约定（新增）
@@ -125,9 +136,12 @@ flowchart TD
 
 | 表名 | 说明 |
 |---|---|
-| `users` | 用户基本信息、微信 openId、状态 |
-| `user_faces` | 人脸特征向量（压缩存储）、绑定用户 |
-| `stores` | 门店信息、MQTT 设备 Key |
+| `consumer` | 消费者基本信息、微信 openId、状态 |
+| `coach` | 教练信息（规划中） |
+| `staff` | 管理人员：姓名、角色、密码哈希、TOTP |
+| `staff_store` | 管理人员与门店的关联（staffId + storeId） |
+| `consumer_face` | 人脸特征向量（压缩存储）、绑定消费者 |
+| `stores` | 门店信息 |
 | `products` | 产品套餐（类型、价格、有效期、次数） |
 | `orders` | 订单（用户、产品、门店、支付状态、有效期） |
 | `checkins` | 进出记录（用户、门店、时间、进/出） |
@@ -173,8 +187,10 @@ flowchart TD
 ```text
 cloud-api/
 ├── src/main/kotlin/com/eachcan/fitness
-│   ├── auth            # 登录鉴权、JWT、权限
-│   ├── user            # 用户、会员状态
+│   ├── auth            # 三套用户体系登录鉴权、JWT RS256、权限上下文
+│   ├── consumer        # 消费者、会员状态
+│   ├── staff           # 管理人员、角色、门店权限
+│   ├── coach           # 教练（规划中）
 │   ├── face            # 人脸特征与远程验证
 │   ├── store           # 门店与设备绑定
 │   ├── product         # 产品/套餐

@@ -12,8 +12,8 @@
 | [工控机看门狗及进程保活](./basics/watchdog) | 进程崩溃自动重启，心跳健康监测 | 工控机 |
 | [OTA 更新](./basics/ota) | 工控机程序远程升级，版本管理 | 工控机、云端 API |
 | [小程序发布](./basics/miniprogram-release) | 客户端/店长端小程序审核与发布流程 | 小程序 |
-| [接口通信安全](./basics/api-security) | JWT 鉴权、HTTPS、MQTT TLS、签名校验 | 云端 API、工控机 |
-| [数据备份与权限控制](./basics/backup-access) | 数据库定时备份、管理员角色与权限体系 | 云端 API、管理后台 |
+| [接口通信安全](./basics/api-security) | 零信任安全、RS256 JWT、mTLS、HMAC 签名 | 云端 API、工控机 |
+| [数据备份与权限控制](./basics/backup-access) | 数据库定时备份、staff 角色与权限体系 | 云端 API、管理后台 |
 | [API 定义文档系统](./basics/api-docs) | OpenAPI/Swagger 接口文档自动生成与维护 | 云端 API |
 | [域名备案与 HTTPS 证书](./basics/domain-https) | 域名 ICP 备案、SSL 证书自动续期 | 云端 API |
 | [安全发布与测试流程](./basics/release-process) | 测试环境隔离、灰度发布、回滚策略 | 全端 |
@@ -23,7 +23,7 @@
 
 | 功能系统 | 核心业务 | 涉及子系统 |
 |---|---|---|
-| [账号系统（微信 + 手机号）](./user-system) | 微信登录、手机号绑定、JWT 签发 | 云端 API、小程序 |
+| [账号系统（三表用户体系）](./user-system) | consumer/coach/staff 独立用户表、微信登录、轻量 JWT | 云端 API、小程序 |
 | [人脸管理](./face-recognition) | 人脸录入、特征向量同步至工控机 | 工控机、云端 API、小程序 |
 | [订单记录](./order-system) | 用户视角的订单历史与状态查询 | 云端 API、小程序 |
 | [进店记录](./user-system#进出记录) | 用户历次进出健身房记录查询 | 云端 API、管理后台、小程序 |
