@@ -29,25 +29,13 @@ jobs:
       - name: 构建文档
         run: npm run docs:build
 
-      - name: 检查 Cloudflare 密钥是否已配置
-        id: check_secrets
-        run: |
-          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
-            echo "configured=false" >> $GITHUB_OUTPUT
-            echo "⚠️  未检测到 CLOUDFLARE_API_TOKEN，跳过部署步骤。"
-            echo "请在仓库 Settings → Secrets → Actions 中添加："
-            echo "  CLOUDFLARE_API_TOKEN"
-            echo "  CLOUDFLARE_ACCOUNT_ID"
-          else
-            echo "configured=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: 部署到 Cloudflare Pages
-        if: steps.check_secrets.outputs.configured == 'true'
-        uses: cloudflare/pages-action@v1
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: fitness-system-docs
-          directory: docs/.vitepress/dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          # Upload entire repository
+          path: 'docs/.vitepress/dist'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
