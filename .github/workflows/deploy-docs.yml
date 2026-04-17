@@ -1,9 +1,10 @@
 name: 部署文档到 GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
 
 concurrency:
   group: pages
