@@ -1,11 +1,23 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 
+/** GitHub Pages：项目页为 /<repo>/；用户/组织站点仓库 *.github.io 为根路径 */
+function resolveBase(): string {
+  if (process.env.VITEPRESS_BASE) {
+    return process.env.VITEPRESS_BASE
+  }
+  const repo = process.env.GITHUB_REPOSITORY?.split('/')[1]
+  if (!repo || repo.endsWith('.github.io')) {
+    return '/'
+  }
+  return `/${repo}/`
+}
+
 export default withMermaid(defineConfig({
   title: '飞创 Fitron',
   description: '飞创 Fitron — 无人值守连锁健身房服务系统规划文档',
   lang: 'zh-CN',
-  base: '/',
+  base: resolveBase(),
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },
